@@ -31,14 +31,14 @@ aside{width:210px;flex:none;padding:12px;position:sticky;top:80px;max-height:cal
 .subline{display:flex;align-items:center;gap:6px;padding:2px 4px;border-radius:5px;cursor:pointer;font-size:12px;color:#333}
 .subline:hover{background:#efeee8}
 .wrap{flex:1;padding:12px 16px;overflow:auto}
-.month{margin:0 0 10px}
-.mlabel{font-size:12px;font-weight:600;color:var(--mut);letter-spacing:.03em;margin:0 0 4px}
+.month{margin:0 0 13px}
+.mlabel{display:inline-block;background:#eef3ea;color:#2b3a1c;padding:2px 11px;border-radius:12px;font-weight:700;font-size:12px;letter-spacing:.02em;margin:0 0 6px}
 .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.cell{background:#fff;border:1px solid var(--bd);border-radius:8px;padding:6px 7px;min-height:52px}
-.cd{display:flex;justify-content:space-between;align-items:center;font-weight:600;color:#111;margin:0 0 3px}
+.cell{background:#fff;border:1px solid #e4e4de;border-radius:9px;padding:5px 7px;min-height:50px;box-shadow:0 1px 2px rgba(20,30,20,.05)}
+.cd{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:#1f2a16;margin:0 0 4px;padding-bottom:3px;border-bottom:1px solid #eef0ec}
 .addb{border:none;background:none;color:var(--mut);cursor:pointer;font-size:15px;line-height:1;padding:0 3px}
 .addb:hover{color:var(--blue)}
-.ent{display:flex;gap:5px;align-items:flex-start;font-size:12px;line-height:1.3;padding:1px 0}
+.ent{display:flex;gap:5px;align-items:flex-start;font-size:12px;line-height:1.32;padding:2px 5px;border-radius:5px;margin:0 0 2px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .ent.geband{background:#e9edf1;border-radius:4px;padding:1px 4px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .ent.off .lab{opacity:.32;text-decoration:line-through}
 .ent input{margin:2px 0 0;flex:none}
@@ -104,12 +104,14 @@ select,input[type=text]{padding:5px 7px;border:1px solid var(--bd);border-radius
   <button class="btn src act" data-s="ge">Γενική Εφορία</button>
   <button class="btn src" data-s="anchor">Πάγια/76</button>
   <button class="btn src" data-s="all">Όλα</button>
+  <button class="btn" id="helpBtn" title="Πώς δουλεύει το εργαλείο">ℹ Οδηγίες</button>
   <span class="count" id="count"></span>
  </div>
  <div class="row" style="margin-top:8px">
   <span class="gl">Βάση:</span>
   <button class="btn" onclick="forceRead()">⟳ Force read</button>
   <button class="btn pri" onclick="forceWrite()">💾 Force write</button>
+  <button class="btn teamonly" id="othBtn" title="Προβολή δράσεων άλλων τμημάτων (read-only)">👁 Άλλα τμήματα</button>
   <span id="saveStatus" style="color:var(--mut);font-size:12px"></span>
   <span class="sep"></span>
   <button class="btn" id="editBtn">✎ Επεξεργασία κατηγοριών</button>
@@ -151,7 +153,7 @@ const MAINS={
  'ΒΑΘΜΟΦΟΡΩΝ':{c:'#5E2A08',subs:['Συνάντηση','Εκπαίδευση','Εκδήλωση']}
 }
 const ORDER=Object.keys(MAINS);
-const API_URL="https://script.google.com/macros/s/AKfycbxTME66DDDOOdU5m__M-_EFjp_DivUchyvXba6DNOmoKD7pJ7lifTEIoJsNBtLANCyE/exec";var TEAM=(new URLSearchParams(location.search).get("team")||"admin");var TMAP={AL:"ΑΛ",OP:"ΟΠ",KA:"ΚΑ",ADMIN:"admin",admin:"admin"};TEAM=TMAP[TEAM]||TEAM;var EXTRA=[];const MN=[9,10,11,12,1,2,3,4,5,6,7,8];const KINDS=[['syg','Συγκέντρωση'],['eid','Ειδική Συγκέντρωση'],['ekdil','Εκδήλωση'],['mono','Μονοήμερο'],['dihm','Διήμερο (1 βράδυ)'],['trihm','Τριήμερο (2 βράδια)'],['kat','Κατασκήνωση (7 βράδια)'],['allo','Άλλο (επιλογή βραδιών)']];const KINDN={syg:0,eid:0,ekdil:0,mono:0,dihm:1,trihm:2,kat:7,allo:0};function defKind(mn){return(mn==='ΑΛ'||mn==='ΟΠ'||mn==='ΚΑ')?'syg':(mn==='ΑΡΓΙΕΣ')?'':'ekdil';}var GIMAP={},_gi=0;BASE.forEach((m,mi)=>m.sats.forEach((s,si)=>{if(s.date)GIMAP[mi+'_'+si]=_gi++;}));var CELLDATE={};BASE.forEach((m,mi)=>m.sats.forEach((s,si)=>{if(s.date)CELLDATE[mi+'_'+si]=new Date(MN[mi]>=9?2026:2027,MN[mi]-1,parseInt(s.date,10));}));function parseDM(s){if(!s)return null;var p=(''+s).split('/');var d=parseInt(p[0],10),mo=parseInt(p[1],10);if(!d||!mo)return null;return new Date(mo>=9?2026:2027,mo-1,d);}function startDate(x){return parseDM(x.draw)||CELLDATE[x.mi+'_'+x.si]||null;}function findCell(e){if(e.mi!==undefined&&e.date)return{mi:e.mi,si:e.si,day:parseInt(e.date,10),mo:MN[e.mi]};for(var mi=0;mi<BASE.length;mi++){var st=BASE[mi].sats;for(var si=0;si<st.length;si++){if(st[si].entries.indexOf(e)>=0)return{mi:mi,si:si,day:parseInt(st[si].date,10),mo:MN[mi]};}}return null;}function weekDays(c){if(!c||!c.day)return[];var y=c.mo>=9?2026:2027,base=new Date(y,c.mo-1,c.day),g=['Κυρ','Δευ','Τρι','Τετ','Πεμ','Παρ','Σαβ'],out=[];for(var o=-1;o<=5;o++){var dt=new Date(base);dt.setDate(dt.getDate()+o);out.push({v:dt.getDate()+'/'+(dt.getMonth()+1),label:g[dt.getDay()]+' '+dt.getDate()+'/'+(dt.getMonth()+1)});}return out;}
+const API_URL="https://script.google.com/macros/s/AKfycbxTME66DDDOOdU5m__M-_EFjp_DivUchyvXba6DNOmoKD7pJ7lifTEIoJsNBtLANCyE/exec";var TEAM=(new URLSearchParams(location.search).get("team")||"admin");var TMAP={AL:"ΑΛ",OP:"ΟΠ",KA:"ΚΑ",ADMIN:"admin",admin:"admin"};TEAM=TMAP[TEAM]||TEAM;var EXTRA=[];var POOLA=[],POOLT=[];function buildExtra(){return (TEAM==='admin')?POOLT.slice():POOLA.concat(ST.showOthers?POOLT:[]);}const MN=[9,10,11,12,1,2,3,4,5,6,7,8];const KINDS=[['syg','Συγκέντρωση'],['eid','Ειδική Συγκέντρωση'],['ekdil','Εκδήλωση'],['mono','Μονοήμερο'],['dihm','Διήμερο (1 βράδυ)'],['trihm','Τριήμερο (2 βράδια)'],['kat','Κατασκήνωση (7 βράδια)'],['allo','Άλλο (επιλογή βραδιών)']];const KINDN={syg:0,eid:0,ekdil:0,mono:0,dihm:1,trihm:2,kat:7,allo:0};function defKind(mn){return(mn==='ΑΛ'||mn==='ΟΠ'||mn==='ΚΑ')?'syg':(mn==='ΑΡΓΙΕΣ')?'':'ekdil';}var GIMAP={},_gi=0;BASE.forEach((m,mi)=>m.sats.forEach((s,si)=>{if(s.date)GIMAP[mi+'_'+si]=_gi++;}));var CELLDATE={};BASE.forEach((m,mi)=>m.sats.forEach((s,si)=>{if(s.date)CELLDATE[mi+'_'+si]=new Date(MN[mi]>=9?2026:2027,MN[mi]-1,parseInt(s.date,10));}));function parseDM(s){if(!s)return null;var p=(''+s).split('/');var d=parseInt(p[0],10),mo=parseInt(p[1],10);if(!d||!mo)return null;return new Date(mo>=9?2026:2027,mo-1,d);}function startDate(x){return parseDM(x.draw)||CELLDATE[x.mi+'_'+x.si]||null;}function findCell(e){if(e.mi!==undefined&&e.date)return{mi:e.mi,si:e.si,day:parseInt(e.date,10),mo:MN[e.mi]};for(var mi=0;mi<BASE.length;mi++){var st=BASE[mi].sats;for(var si=0;si<st.length;si++){if(st[si].entries.indexOf(e)>=0)return{mi:mi,si:si,day:parseInt(st[si].date,10),mo:MN[mi]};}}return null;}function weekDays(c){if(!c||!c.day)return[];var y=c.mo>=9?2026:2027,base=new Date(y,c.mo-1,c.day),g=['Κυρ','Δευ','Τρι','Τετ','Πεμ','Παρ','Σαβ'],out=[];for(var o=-1;o<=5;o++){var dt=new Date(base);dt.setDate(dt.getDate()+o);out.push({v:dt.getDate()+'/'+(dt.getMonth()+1),label:g[dt.getDay()]+' '+dt.getDate()+'/'+(dt.getMonth()+1)});}return out;}
 const LSK='mola7627v2';
 let ST={tags:{},off:{},added:[],fMain:{},fSub:{},edit:false,src:'ge'};
 function loadST(){}
@@ -215,7 +217,7 @@ function renderGrid(){
  });
 }
 function entRow(e){
- const row=document.createElement('div');row.className='ent'+(selected(e)?'':' off')+(e.src==='ΓΕ'?' geband':'');
+ const row=document.createElement('div');row.className='ent'+(selected(e)?'':' off');var _bg=mainColor(e);if(_bg.length===4)_bg='#888888';row.style.background=_bg+'16';
  const cb=document.createElement('input');cb.type='checkbox';cb.checked=selected(e);
  cb.onchange=()=>{if(cb.checked)delete ST.off[e.id];else ST.off[e.id]=1;save()};
  const lab=document.createElement('span');lab.className='lab';lab.style.color=mainColor(e);if(isBold(e))lab.style.fontWeight='600';lab.style.fontSize=sizeFor(e)+'px';
@@ -253,6 +255,7 @@ function openEdit(e){
  }
  draw();document.getElementById('modal').classList.add('on');
 }
+function showHelp(){var b=document.getElementById('modalBox');b.innerHTML='<h3>\u2139 \u039f\u03b4\u03b7\u03b3\u03af\u03b5\u03c2 \u2014 \u039c\u03cc\u03bb\u03b1 76</h3>'+'<div style="font-size:13px;line-height:1.5;color:#222">'+'<p><b>\u03a4\u03b9 \u03b5\u03af\u03bd\u03b1\u03b9:</b> \u03c4\u03bf \u03b6\u03c9\u03bd\u03c4\u03b1\u03bd\u03cc \u03a0\u03c1\u03cc\u03b3\u03c1\u03b1\u03bc\u03bc\u03b1 \u03a7\u03c1\u03bf\u03bd\u03b9\u03ac\u03c2 \u03c4\u03bf\u03c5 \u03a3\u03ce\u03bc\u03b1\u03c4\u03bf\u03c2 (\u03bc\u03ae\u03bd\u03b5\u03c2 \u00d7 \u03a3\u03ac\u03b2\u03b2\u03b1\u03c4\u03b1).</p>'+'<p><b>\u03a4\u03b9 \u03b2\u03bb\u03ad\u03c0\u03b5\u03b9\u03c2/\u03b1\u03bb\u03bb\u03ac\u03b6\u03b5\u03b9\u03c2:</b> \u03ba\u03ac\u03b8\u03b5 link (\u03a3\u03cd\u03c3\u03c4\u03b7\u03bc\u03b1/\u0391\u03b3\u03ad\u03bb\u03b7/\u039f\u03bc\u03ac\u03b4\u03b1/\u039a\u03bf\u03b9\u03bd\u03cc\u03c4\u03b7\u03c4\u03b1) \u03b2\u03bb\u03ad\u03c0\u03b5\u03b9 \u03c4\u03b1 \u03b4\u03b9\u03ba\u03ac \u03c4\u03bf\u03c5 + \u03c4\u03b1 \u03ba\u03bf\u03b9\u03bd\u03ac (\u03a3\u03cd\u03c3\u03c4\u03b7\u03bc\u03b1, \u0393\u03b5\u03bd\u03b9\u03ba\u03ae, \u0395\u03c0\u03b1\u03c1\u03c7\u03af\u03b1, \u03a3\u03c7\u03bf\u03bb\u03ad\u03c2, \u0391\u03c1\u03b3\u03af\u03b5\u03c2, \u0392\u03b1\u03b8\u03bc\u03bf\u03c6\u03cc\u03c1\u03c9\u03bd). \u0395\u03c0\u03b5\u03be\u03b5\u03c1\u03b3\u03ac\u03b6\u03b5\u03c3\u03b1\u03b9 <b>\u03bc\u03cc\u03bd\u03bf \u03c4\u03b9\u03c2 \u03b4\u03b9\u03ba\u03ad\u03c2 \u03c3\u03bf\u03c5</b> (\u03ba\u03b1\u03b9 \u03c4\u03b9\u03c2 \u03ba\u03bf\u03b9\u03bd\u03ad\u03c2 \u03c0\u03bf\u03bb\u03c5\u03c4\u03bc\u03b7\u03bc\u03b1\u03c4\u03b9\u03ba\u03ad\u03c2)\u00b7 \u03c4\u03b1 \u03c5\u03c0\u03cc\u03bb\u03bf\u03b9\u03c0\u03b1 read-only.</p>'+'<p><b>\u03a0\u03c1\u03bf\u03c3\u03b8\u03ae\u03ba\u03b7:</b> \uff0b \u03c0\u03ac\u03bd\u03c9 \u03c3\u03c4\u03bf \u03a3\u03ac\u03b2\u03b2\u03b1\u03c4\u03bf \u2192 \u03c4\u03af\u03c4\u03bb\u03bf\u03c2, \u03ba\u03b1\u03c4\u03b7\u03b3\u03bf\u03c1\u03af\u03b1, \u03b7\u03bc\u03b5\u03c1\u03bf\u03bc\u03b7\u03bd\u03af\u03b1, \u03a4\u03cd\u03c0\u03bf\u03c2, \u03b2\u03c1\u03ac\u03b4\u03b9\u03b1, \u03ce\u03c1\u03b5\u03c2. <b>\u0391\u03bb\u03bb\u03b1\u03b3\u03ae/\u03b4\u03b9\u03b1\u03b3\u03c1\u03b1\u03c6\u03ae:</b> \u270e \u03b4\u03af\u03c0\u03bb\u03b1 \u03c3\u03b5 \u03ba\u03ac\u03b8\u03b5 \u03b4\u03c1\u03ac\u03c3\u03b7.</p>'+'<p><b>\u0391\u03c0\u03bf\u03b8\u03ae\u03ba\u03b5\u03c5\u03c3\u03b7:</b> \u00ab\ud83d\udcbe Force write\u00bb \u03b1\u03bd\u03b5\u03b2\u03ac\u03b6\u03b5\u03b9 <b>\u03bc\u03cc\u03bd\u03bf \u03c4\u03b1 \u03b4\u03b9\u03ba\u03ac \u03c3\u03bf\u03c5</b> \u2014 \u03b4\u03b5\u03bd \u03c3\u03b2\u03ae\u03bd\u03b5\u03b9\u03c2 \u03ac\u03bb\u03bb\u03b1 \u03c4\u03bc\u03ae\u03bc\u03b1\u03c4\u03b1. \u00ab\u27f3 Force read\u00bb \u03c6\u03ad\u03c1\u03bd\u03b5\u03b9 \u03c4\u03b7\u03bd \u03c4\u03b5\u03bb\u03b5\u03c5\u03c4\u03b1\u03af\u03b1 \u03ad\u03ba\u03b4\u03bf\u03c3\u03b7. <b>\u0391\u03c3\u03c6\u03b1\u03bb\u03ae\u03c2 \u03c3\u03b5\u03b9\u03c1\u03ac: Force read \u2192 \u03b1\u03bb\u03bb\u03b1\u03b3\u03ad\u03c2 \u2192 Force write.</b></p>'+'<p><b>\ud83d\udc41 \u0386\u03bb\u03bb\u03b1 \u03c4\u03bc\u03ae\u03bc\u03b1\u03c4\u03b1:</b> \u03c0\u03c1\u03bf\u03b2\u03bf\u03bb\u03ae (read-only) \u03c4\u03c9\u03bd \u03b4\u03c1\u03ac\u03c3\u03b5\u03c9\u03bd \u03c4\u03c9\u03bd \u03ac\u03bb\u03bb\u03c9\u03bd \u03c4\u03bc\u03b7\u03bc\u03ac\u03c4\u03c9\u03bd.</p>'+'<p><b>\u03a6\u03af\u03bb\u03c4\u03c1\u03b1 (\u03b1\u03c1\u03b9\u03c3\u03c4\u03b5\u03c1\u03ac):</b> \u03b4\u03b9\u03ac\u03bb\u03b5\u03be\u03b5 \u03c4\u03b9 \u03b5\u03bc\u03c6\u03b1\u03bd\u03af\u03b6\u03b5\u03c4\u03b1\u03b9\u00b7 \u00ab\u039a\u03b1\u03bc\u03af\u03b1\u00bb \u03b3\u03b9\u03b1 opt-in.</p>'+'<p><b>\u0395\u03ba\u03c4\u03cd\u03c0\u03c9\u03c3\u03b7 / Excel:</b> \u03c4\u03c3\u03ad\u03ba\u03b1\u03c1\u03b5 \u03c4\u03b9 \u03bc\u03c0\u03b1\u03af\u03bd\u03b5\u03b9, \u03bc\u03b5\u03c4\u03ac \ud83d\udda8 \u03ae \u2b07 Excel. \u03a7\u03c1\u03ce\u03bc\u03b1 = \u03ba\u03b1\u03c4\u03b7\u03b3\u03bf\u03c1\u03af\u03b1.</p>'+'</div>';var f=document.createElement('div');f.className='row';f.style.justifyContent='flex-end';f.style.marginTop='10px';var ok=document.createElement('button');ok.className='btn pri';ok.textContent='\u039a\u03bb\u03b5\u03af\u03c3\u03b9\u03bc\u03bf';ok.onclick=close;f.appendChild(ok);b.appendChild(f);document.getElementById('modal').classList.add('on');}
 function close(){ST.added=ST.added.filter(function(x){var tg=ST.tags[x.id]||x.tags||[];return tg.length>0||!x.user});document.getElementById('modal').classList.remove('on');save()}
 document.getElementById('modal').onclick=(e)=>{if(e.target.id==='modal')close()};
 function addEntry(mi,si,date){
@@ -277,7 +280,7 @@ function updCount(){let sel=0,vis=0;eachEntry(e=>{if(visible(e)){vis++;if(select
 function save(){saveST();renderFilters();renderGrid();updCount()}
 document.querySelectorAll('header .btn[data-p]').forEach(b=>b.onclick=()=>setPreset(b.dataset.p));
 document.querySelectorAll('header .btn.src').forEach(b=>b.onclick=()=>{ST.src=b.dataset.s;document.querySelectorAll('header .btn.src').forEach(x=>x.classList.toggle('act',x===b));save()});
-document.getElementById('editBtn').onclick=function(){ST.edit=!ST.edit;document.body.classList.toggle('edit',ST.edit);this.classList.toggle('act',ST.edit)};var _ft=document.getElementById('filtToggle');if(_ft)_ft.onclick=function(){document.body.classList.toggle('showfilters');this.classList.toggle('act',document.body.classList.contains('showfilters'))};
+document.getElementById('editBtn').onclick=function(){ST.edit=!ST.edit;document.body.classList.toggle('edit',ST.edit);this.classList.toggle('act',ST.edit)};var _ft=document.getElementById('filtToggle');if(_ft)_ft.onclick=function(){document.body.classList.toggle('showfilters');this.classList.toggle('act',document.body.classList.contains('showfilters'))};var _ob=document.getElementById('othBtn');if(_ob){if(TEAM==='admin'){_ob.style.display='none';}else{_ob.onclick=function(){ST.showOthers=!ST.showOthers;this.classList.toggle('act',ST.showOthers);if(ST.showOthers){['ΑΛ','ΟΠ','ΚΑ'].forEach(function(m){ST.fMain[m]=true;MAINS[m].subs.forEach(function(s){ST.fSub[m+':'+s]=true})});}else{setPreset(TEAM);}EXTRA=buildExtra();save();};}}var _hb=document.getElementById('helpBtn');if(_hb)_hb.onclick=showHelp;
 function molaXlsx(){
  if(typeof XLSX==='undefined'){alert('Χρειάζεται σύνδεση internet για την εξαγωγή Excel.');return}
  const BORD={top:{style:'thin',color:{rgb:'999999'}},bottom:{style:'thin',color:{rgb:'999999'}},left:{style:'thin',color:{rgb:'999999'}},right:{style:'thin',color:{rgb:'999999'}}};
@@ -345,26 +348,30 @@ if(ST.edit){document.body.classList.add('edit');document.getElementById('editBtn
 if(ST.preset){document.querySelectorAll('header .btn[data-p]').forEach(b=>b.classList.toggle('act',b.dataset.p===ST.preset))}
 if(TEAM!=='admin'&&!ST.preset){ST.src='all';setPreset(TEAM)}
 if(TEAM!=='admin'){['ΣΥΣΤΗΜΑ','ΑΡΓΙΕΣ','ΒΑΘΜΟΦΟΡΩΝ'].forEach(m=>{ST.fMain[m]=true;MAINS[m].subs.forEach(s=>ST.fSub[m+':'+s]=true)})}
-if(API_URL&&API_URL.indexOf("__")<0)forceRead();
+if(API_URL&&API_URL.indexOf("__API_URL__")<0)forceRead();
 try{document.getElementById('teamTag').textContent=' — '+(TEAM==='admin'?'Διαχειριστής':'Τμήμα '+TEAM)}catch(e){}
 if(TEAM!=='admin'){var _at=document.getElementById('adminTools');if(_at)_at.style.display='none'}
 save();
 function setStatus(t){var el=document.getElementById('saveStatus');if(el)el.textContent=t}
 function forceRead(){
- if(!API_URL||API_URL.indexOf('__')>=0){setStatus('⚠ Όρισε το API_URL στο αρχείο');return;}
+ if(!API_URL||API_URL.indexOf('__API_URL__')>=0){setStatus('⚠ Όρισε το API_URL στο αρχείο');return;}
  setStatus('Ανάγνωση…');
  window.__molaCb=function(resp){try{
    var all=(resp&&resp.states)||{};
-   var mine=all[TEAM];if(mine){try{var s=JSON.parse(mine);['tags','off','added','fMain','fSub','src','preset'].forEach(function(k){if(s[k]!==undefined)ST[k]=s[k]})}catch(e){}}
-   EXTRA=[];if(TEAM==='admin'){Object.keys(all).forEach(function(tm){if(tm==='admin')return;try{var st=JSON.parse(all[tm]);(st.added||[]).forEach(function(x){x.owner=tm;x.fromTeam=true;EXTRA.push(x)})}catch(e){}})}
+   var keys=(TEAM==='admin')?['tags','off','added','fMain','fSub','src','preset']:['added','src','preset'];
+   var mine=all[TEAM];if(mine){try{var s=JSON.parse(mine);keys.forEach(function(k){if(s[k]!==undefined)ST[k]=s[k]})}catch(e){}}
+   POOLA=[];POOLT=[];
+   Object.keys(all).forEach(function(tm){if(tm===TEAM)return;try{var st=JSON.parse(all[tm]);(st.added||[]).forEach(function(x){x.owner=x.owner||tm;x.fromTeam=true;(tm==='admin'?POOLA:POOLT).push(x)})}catch(e){}});
+   EXTRA=buildExtra();
    setStatus('Ενημερώθηκε ✓ '+new Date().toLocaleTimeString());save();
  }catch(e){setStatus('Σφάλμα ανάγνωσης')}};
  var s=document.createElement('script');s.src=API_URL+(API_URL.indexOf('?')>=0?'&':'?')+'callback=__molaCb&_='+Date.now();s.onerror=function(){setStatus('Σφάλμα σύνδεσης με τη βάση')};document.body.appendChild(s);setTimeout(function(){try{s.remove()}catch(e){}},9000);
 }
 function forceWrite(){
- if(!API_URL||API_URL.indexOf('__')>=0){setStatus('⚠ Όρισε το API_URL στο αρχείο');return;}
+ if(!API_URL||API_URL.indexOf('__API_URL__')>=0){setStatus('⚠ Όρισε το API_URL στο αρχείο');return;}
  setStatus('Αποθήκευση…');
- var payload=JSON.stringify({team:TEAM,state:{tags:ST.tags,off:ST.off,added:ST.added,fMain:ST.fMain,fSub:ST.fSub,src:ST.src,preset:ST.preset}});
+ var state=(TEAM==='admin')?{tags:ST.tags,off:ST.off,added:ST.added,fMain:ST.fMain,fSub:ST.fSub,src:ST.src,preset:ST.preset}:{added:(ST.added||[]).filter(function(x){return x.owner===TEAM}),src:ST.src,preset:ST.preset};
+ var payload=JSON.stringify({team:TEAM,state:state});
  fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:payload}).then(function(){setStatus('Στάλθηκε ✓ — κάνε Force read για επιβεβαίωση')}).catch(function(){setStatus('Σφάλμα αποθήκευσης')});
 }
 </script>
