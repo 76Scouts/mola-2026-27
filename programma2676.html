@@ -34,7 +34,7 @@ aside{width:210px;flex:none;padding:12px;position:sticky;top:80px;max-height:cal
 .month{margin:0 0 13px}
 .mlabel{display:inline-block;background:#eef3ea;color:#2b3a1c;padding:2px 11px;border-radius:12px;font-weight:700;font-size:12px;letter-spacing:.02em;margin:0 0 6px}
 .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.cell{background:#fff;border:1px solid #e4e4de;border-radius:9px;padding:5px 7px;min-height:50px;box-shadow:0 1px 2px rgba(20,30,20,.05)}
+.cell{background:#fff;border:1px solid #e4e4de;border-radius:9px;padding:5px 7px;min-height:50px;box-shadow:0 1px 2px rgba(20,30,20,.05);overflow:hidden}
 .cd{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:#1f2a16;margin:0 0 4px;padding-bottom:3px;border-bottom:1px solid #eef0ec}
 .addb{border:none;background:none;color:var(--mut);cursor:pointer;font-size:15px;line-height:1;padding:0 3px}
 .addb:hover{color:var(--blue)}
@@ -42,7 +42,7 @@ aside{width:210px;flex:none;padding:12px;position:sticky;top:80px;max-height:cal
 .ent.geband{background:#e9edf1;border-radius:4px;padding:1px 4px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .ent.off .lab{opacity:.32;text-decoration:line-through}
 .ent input{margin:2px 0 0;flex:none}
-.lab{cursor:pointer;flex:1}
+.lab{cursor:pointer;flex:1;min-width:0;overflow-wrap:anywhere}
 .chip{font-size:9px;padding:0 4px;border:1px solid;border-radius:8px;margin-left:3px;white-space:nowrap;vertical-align:1px}
 .pen{cursor:pointer;color:var(--mut);font-size:13px;padding:0 4px;visibility:visible}
 body.edit .pen{visibility:visible}
@@ -56,6 +56,7 @@ body.edit .pen{visibility:visible}
 select,input[type=text]{padding:5px 7px;border:1px solid var(--bd);border-radius:6px;font-size:13px;font-family:inherit}
 .hint{color:var(--mut);font-size:11px;margin:2px 0 8px}
 .mobonly{display:none}
+@media(min-width:761px) and (max-width:1200px){.wrap{padding:8px 10px}.grid{gap:4px}.cell{padding:4px 5px}.ent{font-size:11px;gap:3px}.chip{font-size:8px}.pen{font-size:13px}}
 @media(max-width:760px){
  .mobonly{display:inline-flex;align-items:center}
  header{position:static;padding:10px 12px}
@@ -207,9 +208,10 @@ function renderGrid(){
   md.innerHTML='<div class="mlabel">'+m.label+'</div>';
   const g=document.createElement('div');g.className='grid';
   m.sats.forEach((s,si)=>{
+   if(!s.date)return;
    const cell=document.createElement('div');cell.className='cell';if(s.date){var _sk2=mi+'_'+si;var _hasSyg=ST.syg&&ST.syg[_sk2]&&!(ST.sygOff&&ST.sygOff[_sk2]);if(!_hasSyg){cell.style.background='#eeedea';}}
    const cd=document.createElement('div');cd.className='cd';cd.innerHTML='<span>'+(s.date||'')+'</span>';
-   const ab=document.createElement('button');ab.className='addb';ab.textContent='+';ab.title='Προσθήκη δράσης';ab.onclick=()=>addEntry(mi,si,s.date);cd.appendChild(ab);if(TEAM==='admin'&&s.date){var _k=mi+'_'+si;var _st=ST.syg&&ST.syg[_k];var sgb=document.createElement('button');sgb.className='addb';sgb.style.fontSize='12px';sgb.textContent=_st==='eid'?'Σ*':(_st==='syg'?'Σ':'◦');sgb.title='Συγκέντρωση (—/Συγκ/Ειδική)';sgb.onclick=function(){ST.syg=ST.syg||{};var c=ST.syg[_k];if(!c)ST.syg[_k]='syg';else if(c==='syg')ST.syg[_k]='eid';else delete ST.syg[_k];save();};cd.appendChild(sgb);}
+   const ab=document.createElement('button');ab.className='addb';ab.textContent='+';ab.title='Προσθήκη δράσης';ab.onclick=()=>addEntry(mi,si,s.date);cd.appendChild(ab);if(TEAM==='admin'&&s.date){var _k=mi+'_'+si;var _st=ST.syg&&ST.syg[_k];var sgb=document.createElement('button');sgb.className='addb';sgb.style.fontSize='12px';sgb.textContent=_st==='eid'?'Σ*':(_st==='syg'?'Σ':'＋Σ');sgb.title='Συγκέντρωση (—/Συγκ/Ειδική)';sgb.onclick=function(){ST.syg=ST.syg||{};var c=ST.syg[_k];if(!c)ST.syg[_k]='syg';else if(c==='syg')ST.syg[_k]='eid';else delete ST.syg[_k];save();};cd.appendChild(sgb);}
    cell.appendChild(cd);
    const cdt=CELLDATE[mi+"_"+si];const inSpan=x=>{if(x.mi===mi&&x.si===si)return true;if(!cdt)return false;var sd=startDate(x);if(!sd)return false;var ed=new Date(sd);ed.setDate(ed.getDate()+(x.nights||0));return cdt>=sd&&cdt<=ed;};const list=s.entries.concat(ST.added.filter(inSpan)).concat(EXTRA.filter(inSpan));list.sort(function(a,b){return (a.src==='ΓΕ'?1:0)-(b.src==='ΓΕ'?1:0)});var _sk=mi+'_'+si;if(ST.syg&&ST.syg[_sk])list.unshift(makeSyg(mi,si));
    list.forEach(e=>{if(visible(e))cell.appendChild(entRow(e))});
