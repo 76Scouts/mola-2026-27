@@ -101,9 +101,10 @@ select,input[type=text]{padding:5px 7px;border:1px solid var(--bd);border-radius
   <button class="btn" data-p="custom">Προσαρμογή</button>
   <span class="sep"></span>
   <span class="gl">Πηγή:</span>
-  <button class="btn src" data-s="ge">Γενική Εφορία</button>
-  <button class="btn src" data-s="anchor">Πάγια/76</button>
-  <button class="btn src act" data-s="all">Όλα</button>
+  <button class="btn src act" data-s="gen">Γενική</button>
+  <button class="btn src act" data-s="epx">Επαρχία</button>
+  <button class="btn src act" data-s="pag">Πάγια/76</button>
+  <button class="btn src" data-s="all">Όλα</button>
   <button class="btn" id="helpBtn" title="Πώς δουλεύει το εργαλείο">ℹ Οδηγίες</button>
   <span class="count" id="count"></span>
  </div>
@@ -155,7 +156,7 @@ const MAINS={
 const ORDER=Object.keys(MAINS);
 const API_URL="https://script.google.com/macros/s/AKfycbxTME66DDDOOdU5m__M-_EFjp_DivUchyvXba6DNOmoKD7pJ7lifTEIoJsNBtLANCyE/exec";var TEAM=(new URLSearchParams(location.search).get("team")||"admin");var TMAP={AL:"ΑΛ",OP:"ΟΠ",KA:"ΚΑ",ADMIN:"admin",admin:"admin"};TEAM=TMAP[TEAM]||TEAM;var EXTRA=[];var POOLA=[],POOLT=[];function buildExtra(){return (TEAM==='admin')?POOLT.slice():POOLA.concat(ST.showOthers?POOLT:[]);}const MN=[9,10,11,12,1,2,3,4,5,6,7,8];const KINDS=[['syg','Συγκέντρωση'],['eid','Ειδική Συγκέντρωση'],['ekdil','Εκδήλωση'],['mono','Μονοήμερο'],['dihm','Διήμερο (1 βράδυ)'],['trihm','Τριήμερο (2 βράδια)'],['kat','Κατασκήνωση (7 βράδια)'],['allo','Άλλο (επιλογή βραδιών)']];const KINDN={syg:0,eid:0,ekdil:0,mono:0,dihm:1,trihm:2,kat:7,allo:0};function defKind(mn){return(mn==='ΑΛ'||mn==='ΟΠ'||mn==='ΚΑ')?'syg':(mn==='ΑΡΓΙΕΣ')?'':'ekdil';}var GIMAP={},_gi=0;BASE.forEach((m,mi)=>m.sats.forEach((s,si)=>{if(s.date)GIMAP[mi+'_'+si]=_gi++;}));var CELLDATE={};BASE.forEach((m,mi)=>m.sats.forEach((s,si)=>{if(s.date)CELLDATE[mi+'_'+si]=new Date(MN[mi]>=9?2026:2027,MN[mi]-1,parseInt(s.date,10));}));function parseDM(s){if(!s)return null;var p=(''+s).split('/');var d=parseInt(p[0],10),mo=parseInt(p[1],10);if(!d||!mo)return null;return new Date(mo>=9?2026:2027,mo-1,d);}function startDate(x){return parseDM(x.draw)||CELLDATE[x.mi+'_'+x.si]||null;}function findCell(e){if(e.mi!==undefined&&e.date)return{mi:e.mi,si:e.si,day:parseInt(e.date,10),mo:MN[e.mi]};for(var mi=0;mi<BASE.length;mi++){var st=BASE[mi].sats;for(var si=0;si<st.length;si++){if(st[si].entries.indexOf(e)>=0)return{mi:mi,si:si,day:parseInt(st[si].date,10),mo:MN[mi]};}}return null;}function weekDays(c){if(!c||!c.day)return[];var y=c.mo>=9?2026:2027,base=new Date(y,c.mo-1,c.day),g=['Κυρ','Δευ','Τρι','Τετ','Πεμ','Παρ','Σαβ'],out=[];for(var o=-1;o<=5;o++){var dt=new Date(base);dt.setDate(dt.getDate()+o);out.push({v:dt.getDate()+'/'+(dt.getMonth()+1),label:g[dt.getDay()]+' '+dt.getDate()+'/'+(dt.getMonth()+1)});}return out;}
 const LSK='mola7627v2';
-let ST={tags:{},off:{},added:[],fMain:{},fSub:{},edit:false,src:'all',ovr:{},del:{}};
+let ST={tags:{},off:{},added:[],fMain:{},fSub:{},edit:false,srcSet:{gen:1,epx:1,pag:1},ovr:{},del:{}};
 function loadST(){}
 function saveST(){localStorage.setItem(LSK,JSON.stringify(ST))}
 loadST();
@@ -163,7 +164,7 @@ if(!Object.keys(ST.fMain).length){ORDER.forEach(m=>{ST.fMain[m]=true;MAINS[m].su
 function tagsOf(e){return ST.tags[e.id]||e.tags}
 function ownerOf(e){return e.owner||e.src||'ΓΕ'}
 function eachEntry(cb){BASE.forEach((m,mi)=>m.sats.forEach((s,si)=>s.entries.forEach(e=>cb(e,mi,si,s))));ST.added.forEach(e=>cb(e,e.mi,e.si,{date:e.date}));EXTRA.forEach(e=>cb(e,e.mi,e.si,{date:e.date}))}
-function srcOK(e){const s=e.src||'ΠΑΓΙΟ';if(s==='ΤΜΗΜΑ')return true;if(ST.src==='all')return true;if(ST.src==='ge')return s==='ΓΕ';return s!=='ΓΕ'}
+function grp(m){return (m==='ΓΕΝΙΚΗ'||m==='ΣΧΟΛΕΣ')?'gen':(m==='ΕΠΑΡΧΙΑ')?'epx':'pag'}function srcOK(e){var ss=ST.srcSet||{gen:1,epx:1,pag:1};return tagsOf(e).some(function(t){return ss[grp(t.split(':')[0])]})}
 function visible(e){return !(ST.del&&ST.del[e.id])&&srcOK(e)&&tagsOf(e).some(tg=>{const[m,s]=tg.split(':');return ST.fMain[m]&&ST.fSub[m+':'+s]!==false})}
 function selected(e){return !ST.off[e.id]}
 function mainColor(e){var tg=tagsOf(e);return tg.length?(MAINS[tg[0].split(':')[0]]||{c:'#4E1F78'}).c:'#888'}
@@ -271,15 +272,15 @@ function setPreset(p){
  else if(p==='all'){ORDER.forEach(m=>{ST.fMain[m]=true;MAINS[m].subs.forEach(s=>ST.fSub[m+':'+s]=true)})}
  else{ORDER.forEach(m=>{ST.fMain[m]=false;MAINS[m].subs.forEach(s=>ST.fSub[m+':'+s]=true)});
   ['ΣΥΣΤΗΜΑ','ΑΡΓΙΕΣ','ΒΑΘΜΟΦΟΡΩΝ','ΣΧΟΛΕΣ','ΓΕΝΙΚΗ','ΕΠΑΡΧΙΑ',p].forEach(m=>ST.fMain[m]=true);
-  ['ΣΧΟΛΕΣ','ΓΕΝΙΚΗ','ΕΠΑΡΧΙΑ'].forEach(mm=>{MAINS[mm].subs.forEach(s=>ST.fSub[mm+':'+s]=(s===p||s==='Σημαντικά'||(mm==='ΕΠΑΡΧΙΑ'&&s==='Άλλες')))});}
+  ['ΣΧΟΛΕΣ','ΓΕΝΙΚΗ','ΕΠΑΡΧΙΑ'].forEach(mm=>{MAINS[mm].subs.forEach(s=>ST.fSub[mm+':'+s]=(s===p||s==='Σημαντικά'||(mm==='ΕΠΑΡΧΙΑ'&&s==='Άλλες')||(mm==='ΣΧΟΛΕΣ'&&s==='ΣΠΕΒ')))});}
  ST.preset=p;document.querySelectorAll('header .btn[data-p]').forEach(b=>b.classList.toggle('act',b.dataset.p===p));
  save();
 }
 function markCustom(){ST.preset='custom';document.querySelectorAll('header .btn[data-p]').forEach(b=>b.classList.toggle('act',b.dataset.p==='custom'))}function catAll(v){ORDER.forEach(m=>{ST.fMain[m]=v;MAINS[m].subs.forEach(s=>ST.fSub[m+':'+s]=v)});markCustom();save()}
 function updCount(){let sel=0,vis=0;eachEntry(e=>{if(visible(e)){vis++;if(selected(e))sel++}});document.getElementById('count').textContent=sel+' επιλεγμένες / '+vis+' ορατές';}
-function applyOvr(){if(!ST.ovr)return;BASE.forEach(m=>m.sats.forEach(s=>s.entries.forEach(e=>{var o=ST.ovr[e.id];if(o)['t','draw','dnote','kind','nights','hours','b'].forEach(k=>{if(o[k]!==undefined)e[k]=o[k]})})))}function syncSrc(){document.querySelectorAll('header .btn.src').forEach(x=>x.classList.toggle('act',x.dataset.s===ST.src))}function save(){applyOvr();saveST();renderFilters();renderGrid();updCount();syncSrc()}
+function applyOvr(){if(!ST.ovr)return;BASE.forEach(m=>m.sats.forEach(s=>s.entries.forEach(e=>{var o=ST.ovr[e.id];if(o)['t','draw','dnote','kind','nights','hours','b'].forEach(k=>{if(o[k]!==undefined)e[k]=o[k]})})))}function syncSrc(){var ss=ST.srcSet||{};var allon=ss.gen&&ss.epx&&ss.pag;document.querySelectorAll('header .btn.src').forEach(function(x){var d=x.dataset.s;x.classList.toggle('act',d==='all'?!!allon:!!ss[d])})}function save(){applyOvr();saveST();renderFilters();renderGrid();updCount();syncSrc()}
 document.querySelectorAll('header .btn[data-p]').forEach(b=>b.onclick=()=>setPreset(b.dataset.p));
-document.querySelectorAll('header .btn.src').forEach(b=>b.onclick=()=>{ST.src=b.dataset.s;document.querySelectorAll('header .btn.src').forEach(x=>x.classList.toggle('act',x===b));save()});
+document.querySelectorAll('header .btn.src').forEach(b=>b.onclick=()=>{var d=b.dataset.s;ST.srcSet=ST.srcSet||{gen:1,epx:1,pag:1};if(d==='all'){ST.srcSet={gen:1,epx:1,pag:1}}else{ST.srcSet[d]=ST.srcSet[d]?0:1;if(!ST.srcSet.gen&&!ST.srcSet.epx&&!ST.srcSet.pag)ST.srcSet[d]=1}save()});
 document.getElementById('editBtn').onclick=function(){ST.edit=!ST.edit;document.body.classList.toggle('edit',ST.edit);this.classList.toggle('act',ST.edit)};var _ft=document.getElementById('filtToggle');if(_ft)_ft.onclick=function(){document.body.classList.toggle('showfilters');this.classList.toggle('act',document.body.classList.contains('showfilters'))};var _ob=document.getElementById('othBtn');if(_ob){if(TEAM==='admin'){_ob.style.display='none';}else{_ob.onclick=function(){ST.showOthers=!ST.showOthers;this.classList.toggle('act',ST.showOthers);if(ST.showOthers){['ΑΛ','ΟΠ','ΚΑ'].forEach(function(m){ST.fMain[m]=true;MAINS[m].subs.forEach(function(s){ST.fSub[m+':'+s]=true})});}else{setPreset(TEAM);}EXTRA=buildExtra();save();};}}var _hb=document.getElementById('helpBtn');if(_hb)_hb.onclick=showHelp;
 function molaXlsx(){
  if(typeof XLSX==='undefined'){alert('Χρειάζεται σύνδεση internet για την εξαγωγή Excel.');return}
@@ -346,7 +347,7 @@ function impJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReader()
 function resetAll(){if(confirm('Επαναφορά όλων των επιλογών/κατηγοριών;')){localStorage.removeItem(LSK);location.reload()}}
 if(ST.edit){document.body.classList.add('edit');document.getElementById('editBtn').classList.add('act')}
 if(ST.preset){document.querySelectorAll('header .btn[data-p]').forEach(b=>b.classList.toggle('act',b.dataset.p===ST.preset))}
-if(TEAM!=='admin'&&!ST.preset){ST.src='all';setPreset(TEAM)}
+if(TEAM!=='admin'&&!ST.preset){setPreset(TEAM)}
 if(TEAM!=='admin'){['ΣΥΣΤΗΜΑ','ΑΡΓΙΕΣ','ΒΑΘΜΟΦΟΡΩΝ'].forEach(m=>{ST.fMain[m]=true;MAINS[m].subs.forEach(s=>ST.fSub[m+':'+s]=true)})}
 if(API_URL&&API_URL.indexOf("__API_URL__")<0)forceRead();
 try{document.getElementById('teamTag').textContent=' — '+(TEAM==='admin'?'Διαχειριστής':'Τμήμα '+TEAM)}catch(e){}
@@ -361,7 +362,7 @@ function forceRead(){
    var keys=(TEAM==='admin')?['tags','off','added','fMain','fSub','preset','ovr','del']:['added','preset'];
    var mine=all[TEAM];if(mine){try{var s=JSON.parse(mine);keys.forEach(function(k){if(s[k]!==undefined)ST[k]=s[k]})}catch(e){}}
    POOLA=[];POOLT=[];
-   Object.keys(all).forEach(function(tm){if(tm===TEAM)return;try{var st=JSON.parse(all[tm]);(st.added||[]).forEach(function(x){x.owner=x.owner||tm;x.fromTeam=true;(tm==='admin'?POOLA:POOLT).push(x)})}catch(e){}});
+   Object.keys(all).forEach(function(tm){if(tm===TEAM)return;try{var st=JSON.parse(all[tm]);if(tm==='admin'&&TEAM!=='admin'){ST.del=st.del||{};ST.ovr=st.ovr||{};}(st.added||[]).forEach(function(x){x.owner=x.owner||tm;x.fromTeam=true;(tm==='admin'?POOLA:POOLT).push(x)})}catch(e){}});
    EXTRA=buildExtra();
    setStatus('Ενημερώθηκε ✓ '+new Date().toLocaleTimeString());save();
  }catch(e){setStatus('Σφάλμα ανάγνωσης')}};
@@ -370,7 +371,7 @@ function forceRead(){
 function forceWrite(){
  if(!API_URL||API_URL.indexOf('__API_URL__')>=0){setStatus('⚠ Όρισε το API_URL στο αρχείο');return;}
  setStatus('Αποθήκευση…');
- var state=(TEAM==='admin')?{tags:ST.tags,off:ST.off,added:ST.added,fMain:ST.fMain,fSub:ST.fSub,src:ST.src,preset:ST.preset,ovr:ST.ovr,del:ST.del}:{added:(ST.added||[]).filter(function(x){return x.owner===TEAM}),src:ST.src,preset:ST.preset};
+ var state=(TEAM==='admin')?{tags:ST.tags,off:ST.off,added:ST.added,fMain:ST.fMain,fSub:ST.fSub,preset:ST.preset,ovr:ST.ovr,del:ST.del}:{added:(ST.added||[]).filter(function(x){return x.owner===TEAM}),preset:ST.preset};
  var payload=JSON.stringify({team:TEAM,state:state});
  fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:payload}).then(function(){setStatus('Στάλθηκε ✓ — κάνε Force read για επιβεβαίωση')}).catch(function(){setStatus('Σφάλμα αποθήκευσης')});
 }
