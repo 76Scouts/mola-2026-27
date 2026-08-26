@@ -43,7 +43,7 @@ aside{width:210px;flex:none;padding:12px;position:sticky;top:80px;max-height:cal
 .ent.off .lab{opacity:.32;text-decoration:line-through}
 .ent input{margin:2px 0 0;flex:none}
 .lab{cursor:pointer;flex:1;min-width:0;overflow-wrap:anywhere}
-.chip{font-size:9px;padding:0 4px;border:1px solid;border-radius:8px;margin-left:3px;white-space:nowrap;vertical-align:1px}
+.chip{font-size:9px;padding:0 4px;border:1px solid;border-radius:8px;margin-left:3px;white-space:normal;overflow-wrap:anywhere;vertical-align:1px}
 .pen{cursor:pointer;color:var(--mut);font-size:13px;padding:0 4px;visibility:visible}
 body.edit .pen{visibility:visible}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:50}
@@ -209,11 +209,11 @@ function renderGrid(){
   const g=document.createElement('div');g.className='grid';
   m.sats.forEach((s,si)=>{
    if(!s.date)return;
-   const cell=document.createElement('div');cell.className='cell';if(s.date){var _sk2=mi+'_'+si;var _hasSyg=ST.syg&&ST.syg[_sk2]&&!(ST.sygOff&&ST.sygOff[_sk2]);if(!_hasSyg){cell.style.background='#eeedea';}}
+   const cell=document.createElement('div');cell.className='cell';
    const cd=document.createElement('div');cd.className='cd';cd.innerHTML='<span>'+(s.date||'')+'</span>';
    const ab=document.createElement('button');ab.className='addb';ab.textContent='+';ab.title='Προσθήκη δράσης';ab.onclick=()=>addEntry(mi,si,s.date);cd.appendChild(ab);if(TEAM==='admin'&&s.date){var _k=mi+'_'+si;var _st=ST.syg&&ST.syg[_k];var sgb=document.createElement('button');sgb.className='addb';sgb.style.fontSize='12px';sgb.textContent=_st==='eid'?'Σ*':(_st==='syg'?'Σ':'＋Σ');sgb.title='Συγκέντρωση (—/Συγκ/Ειδική)';sgb.onclick=function(){ST.syg=ST.syg||{};var c=ST.syg[_k];if(!c)ST.syg[_k]='syg';else if(c==='syg')ST.syg[_k]='eid';else delete ST.syg[_k];save();};cd.appendChild(sgb);}
    cell.appendChild(cd);
-   const cdt=CELLDATE[mi+"_"+si];const inSpan=x=>{if(x.mi===mi&&x.si===si)return true;if(!cdt)return false;var sd=startDate(x);if(!sd)return false;var ed=new Date(sd);ed.setDate(ed.getDate()+(x.nights||0));return cdt>=sd&&cdt<=ed;};const list=s.entries.concat(ST.added.filter(inSpan)).concat(EXTRA.filter(inSpan));list.sort(function(a,b){return (a.src==='ΓΕ'?1:0)-(b.src==='ΓΕ'?1:0)});var _sk=mi+'_'+si;if(ST.syg&&ST.syg[_sk])list.unshift(makeSyg(mi,si));
+   const inSpan=x=>(x.mi===mi&&x.si===si);const list=s.entries.concat(ST.added.filter(inSpan)).concat(EXTRA.filter(inSpan));list.sort(function(a,b){return (a.src==='ΓΕ'?1:0)-(b.src==='ΓΕ'?1:0)});var _sk=mi+'_'+si;if(ST.syg&&ST.syg[_sk])list.unshift(makeSyg(mi,si));var _es=ST.syg&&ST.syg[_sk]&&!(ST.sygOff&&ST.sygOff[_sk]);var _hk=list.some(function(e){return e.kind==='kat'});if(s.date&&!_es&&!_hk)cell.style.background='#eeedea';
    list.forEach(e=>{if(visible(e))cell.appendChild(entRow(e))});
    g.appendChild(cell);
   });
@@ -226,7 +226,7 @@ function entRow(e){
  const cb=document.createElement('input');cb.type='checkbox';cb.checked=selected(e);
  cb.onchange=()=>{if(cb.checked)delete ST.off[e.id];else ST.off[e.id]=1;save()};
  const lab=document.createElement('span');lab.className='lab';lab.style.color=mainColor(e);if(isBold(e))lab.style.fontWeight='600';lab.style.fontSize=sizeFor(e)+'px';
- lab.appendChild(document.createTextNode(e.t));var _nt=[e.dnote,(e.kind==='eid'?'ειδ.':''),e.hours].filter(Boolean).join(' · ');if(_nt){var dn=document.createElement('span');dn.style.color='var(--mut)';dn.style.fontSize='10px';dn.textContent=' · '+_nt;lab.appendChild(dn)}
+ lab.appendChild(document.createTextNode(e.t));var _rng='';if(e.nights>0){var _sd=startDate(e);if(_sd){var _ed=new Date(_sd);_ed.setDate(_ed.getDate()+e.nights);_rng=_sd.getDate()+(_sd.getMonth()!==_ed.getMonth()?'/'+(_sd.getMonth()+1):'')+'–'+_ed.getDate()+'/'+(_ed.getMonth()+1);}}var _dd=(e.nights>0&&_rng)?_rng:e.dnote;var _nt=[_dd,(e.kind==='eid'?'ειδ.':''),e.hours].filter(Boolean).join(' · ');if(_nt){var dn=document.createElement('span');dn.style.color='var(--mut)';dn.style.fontSize='10px';dn.textContent=' · '+_nt;lab.appendChild(dn)}
  var _tm=[];tagsOf(e).forEach(function(t){var m=t.split(':')[0];if((m==='ΑΛ'||m==='ΟΠ'||m==='ΚΑ')&&_tm.indexOf(m)<0)_tm.push(m)});if(_tm.length>1){var kb=document.createElement('span');kb.className='chip';kb.style.color='#5A5A5A';kb.style.borderColor='#5A5A5A';kb.textContent='κοινό';lab.appendChild(kb);} tagsOf(e).forEach(tg=>{const[mm,ss]=tg.split(':');const ch=document.createElement('span');ch.className='chip';ch.style.color=MAINS[mm].c;ch.style.borderColor=MAINS[mm].c;ch.textContent=mm+(ss&&ss!=='—'?'·'+ss:'');lab.appendChild(ch)});
  lab.onclick=()=>{if(ST.edit)openEdit(e);else{cb.checked=!cb.checked;cb.onchange()}};
  const pen=document.createElement('span');pen.className='pen';pen.textContent='✎';pen.onclick=()=>openEdit(e);
