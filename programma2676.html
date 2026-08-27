@@ -43,7 +43,7 @@ aside{width:210px;flex:none;padding:12px;position:sticky;top:80px;max-height:cal
 .ent.off .lab{opacity:.32;text-decoration:line-through}
 .ent input{margin:2px 0 0;flex:none}
 .lab{cursor:pointer;flex:1;min-width:0;overflow-wrap:anywhere}
-.chip{font-size:9px;padding:0 4px;border:1px solid;border-radius:8px;margin-left:3px;white-space:normal;overflow-wrap:anywhere;vertical-align:1px}
+.chip{font-size:9px;padding:0 4px;border:1px solid;border-radius:8px;margin:2px 0 0 3px;white-space:nowrap;display:inline-block;vertical-align:1px}
 .pen{cursor:pointer;color:var(--mut);font-size:13px;padding:0 4px;visibility:visible}
 body.edit .pen{visibility:visible}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:50}
@@ -213,7 +213,7 @@ function renderGrid(){
    const cd=document.createElement('div');cd.className='cd';cd.innerHTML='<span>'+(s.date||'')+'</span>';
    const ab=document.createElement('button');ab.className='addb';ab.textContent='+';ab.title='Προσθήκη δράσης';ab.onclick=()=>addEntry(mi,si,s.date);cd.appendChild(ab);if(TEAM==='admin'&&s.date){var _k=mi+'_'+si;var _st=ST.syg&&ST.syg[_k];var sgb=document.createElement('button');sgb.className='addb';sgb.style.fontSize='12px';sgb.textContent=_st==='eid'?'Σ*':(_st==='syg'?'Σ':'＋Σ');sgb.title='Συγκέντρωση (—/Συγκ/Ειδική)';sgb.onclick=function(){ST.syg=ST.syg||{};var c=ST.syg[_k];if(!c)ST.syg[_k]='syg';else if(c==='syg')ST.syg[_k]='eid';else delete ST.syg[_k];save();};cd.appendChild(sgb);}
    cell.appendChild(cd);
-   const inSpan=x=>(x.mi===mi&&x.si===si);const list=s.entries.concat(ST.added.filter(inSpan)).concat(EXTRA.filter(inSpan));list.sort(function(a,b){return (a.src==='ΓΕ'?1:0)-(b.src==='ΓΕ'?1:0)});var _sk=mi+'_'+si;if(ST.syg&&ST.syg[_sk])list.unshift(makeSyg(mi,si));var _es=ST.syg&&ST.syg[_sk]&&!(ST.sygOff&&ST.sygOff[_sk]);var _hk=list.some(function(e){return e.kind==='kat'});if(s.date&&!_es&&!_hk)cell.style.background='#eeedea';
+   const inSpan=x=>(x.mi===mi&&x.si===si);const list=s.entries.concat(ST.added.filter(inSpan)).concat(EXTRA.filter(inSpan));list.sort(function(a,b){if(!!a.syn!==!!b.syn)return a.syn?-1:1;var da=startDate(a),db=startDate(b);var ta=da?da.getTime():Infinity,tb=db?db.getTime():Infinity;if(ta!==tb)return ta-tb;return (a.src==='ΓΕ'?1:0)-(b.src==='ΓΕ'?1:0);});var _sk=mi+'_'+si;if(ST.syg&&ST.syg[_sk])list.unshift(makeSyg(mi,si));var _es=ST.syg&&ST.syg[_sk]&&!(ST.sygOff&&ST.sygOff[_sk]);var _hk=list.some(function(e){return e.kind==='kat'});if(s.date&&!_es&&!_hk)cell.style.background='#eeedea';
    list.forEach(e=>{if(visible(e))cell.appendChild(entRow(e))});
    g.appendChild(cell);
   });
@@ -314,7 +314,7 @@ function molaXlsx(){
  BASE.forEach((m,mi)=>{
   const sats=m.sats.map((sc,si)=>{
    const es=sc.entries.concat(ST.added.filter(x=>x.mi===mi&&x.si===si)).concat(EXTRA.filter(x=>x.mi===mi&&x.si===si)).concat((ST.syg&&ST.syg[mi+'_'+si])?[makeSyg(mi,si)]:[]).filter(e=>selected(e)&&visible(e));
-   return {date:sc.date,own:es.filter(e=>e.src!=='ΓΕ'),ge:es.filter(e=>e.src==='ΓΕ')};
+   var _c=function(a,b){var da=startDate(a),db=startDate(b);return (da?da.getTime():Infinity)-(db?db.getTime():Infinity);};return {date:sc.date,own:es.filter(e=>e.src!=='ΓΕ').sort(_c),ge:es.filter(e=>e.src==='ΓΕ').sort(_c)};
   });
   const maxOwn=Math.max(0,...sats.map(s=>s.own.length));
   const maxGe=Math.max(0,...sats.map(s=>s.ge.length));
