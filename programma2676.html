@@ -109,7 +109,7 @@ select,input[type=text]{padding:5px 7px;border:1px solid var(--bd);border-radius
   <button class="btn" id="helpBtn" title="Πώς δουλεύει το εργαλείο">ℹ Οδηγίες</button>
   <span class="count" id="count"></span>
  </div>
- <div class="row" style="margin-top:8px">
+ <div class="row" id="dbRow" style="margin-top:8px">
   <span class="gl">Βάση:</span>
   <button class="btn" onclick="forceRead()">⟳ Force read</button>
   <button class="btn pri" id="fwBtn" onclick="forceWrite()">💾 Force write</button>
@@ -355,7 +355,7 @@ if(RO){setPreset('all')}else if(TEAM!=='admin'&&!ST.preset){setPreset(TEAM)}
 if(TEAM!=='admin'&&!RO){['ΣΥΣΤΗΜΑ','ΑΡΓΙΕΣ','ΒΑΘΜΟΦΟΡΩΝ'].forEach(m=>{ST.fMain[m]=true;MAINS[m].subs.forEach(s=>ST.fSub[m+':'+s]=true)})}
 if(API_URL&&API_URL.indexOf("__API_URL__")<0)forceRead();
 try{document.getElementById('teamTag').textContent=' — '+(TEAM==='admin'?'Διαχειριστής':RO?'Προβολή (μόνο ανάγνωση)':'Τμήμα '+TEAM)}catch(e){}
-if(TEAM!=='admin'){['resetBtn','addCatBtn'].forEach(function(id){var b=document.getElementById(id);if(b)b.style.display='none'})}if(RO){['fwBtn','editBtn','othBtn','adminTools'].forEach(function(id){var b=document.getElementById(id);if(b)b.style.display='none'})}
+if(TEAM!=='admin'){['resetBtn','addCatBtn'].forEach(function(id){var b=document.getElementById(id);if(b)b.style.display='none'})}if(RO){['dbRow','adminTools'].forEach(function(id){var b=document.getElementById(id);if(b)b.style.display='none'})}
 save();
 function setStatus(t){var el=document.getElementById('saveStatus');if(el)el.textContent=t}
 function forceRead(){
