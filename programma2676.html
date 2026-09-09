@@ -380,5 +380,16 @@ function forceWrite(){
  fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:payload}).then(function(){setStatus('Στάλθηκε ✓ — κάνε Force read για επιβεβαίωση')}).catch(function(){setStatus('Σφάλμα αποθήκευσης')});
 }
 </script>
+<script>
+/* Καθαρίζει το _gl (linker του Google Analytics) από τη διεύθυνση, ώστε ο
+   σύνδεσμος που αντιγράφει κανείς να μην κουβαλά αναγνωριστικό συσκευής.
+   Δεν αγγίζει καμία άλλη παράμετρο — το ?a= και το ?team= μένουν ακέραια. */
+(function(){try{
+  var u=new URL(location.href),n=0;
+  ["_gl","_ga"].forEach(function(k){ if(u.searchParams.has(k)){u.searchParams.delete(k);n++;} });
+  if(n){ var q=u.searchParams.toString();
+    history.replaceState(null,"",u.pathname+(q?"?"+q:"")+u.hash); }
+}catch(e){}})();
+</script>
 </body>
 </html>
