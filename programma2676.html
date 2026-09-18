@@ -132,6 +132,7 @@ select,input[type=text]{padding:5px 7px;border:1px solid var(--bd);border-radius
   <button class="btn" onclick="expJSON()">⬇ Αποθήκευση .json</button>
   <button class="btn" onclick="document.getElementById('imp').click()">⬆ Εισαγωγή .json</button>
   <input id="imp" type="file" accept=".json" style="display:none" onchange="impJSON(this)">
+  <button class="btn" id="allSygBtn" title="Βάλε/βγάλε Συγκέντρωση σε όλα τα Σάββατα">Σ όλα τα ΣΚ</button>
   <button class="btn" id="addCatBtn">＋ Κατηγορία</button>
   <button class="btn" id="resetBtn" onclick="resetAll()">↺ Επαναφορά</button>
  </div>
@@ -285,7 +286,7 @@ function updCount(){let sel=0,vis=0;eachEntry(e=>{if(visible(e)){vis++;if(select
 function applyOvr(){if(!ST.ovr)return;BASE.forEach(m=>m.sats.forEach(s=>s.entries.forEach(e=>{var o=ST.ovr[e.id];if(o)['t','draw','dnote','kind','nights','hours','b'].forEach(k=>{if(o[k]!==undefined)e[k]=o[k]})})))}function syncSrc(){var ss=ST.srcSet||{};var allon=ss.gen&&ss.epx&&ss.pag;document.querySelectorAll('header .btn.src').forEach(function(x){var d=x.dataset.s;x.classList.toggle('act',d==='all'?!!allon:!!ss[d])})}function makeSyg(mi,si){var k=mi+'_'+si;var t=(ST.syg&&ST.syg[k]==='eid')?'Ειδική Συγκέντρωση':'Συγκέντρωση';return {id:'syg_'+k,t:t,tags:['ΣΥΣΤΗΜΑ:Συγκέντρωση'],b:false,src:'ΠΑΓΙΟ',mi:mi,si:si,syn:true};}function sygList(){var out=[];if(ST.syg)Object.keys(ST.syg).forEach(function(k){var p=k.split('_');out.push(makeSyg(+p[0],+p[1]))});return out;}function applyXmains(){if(ST.xmains)ST.xmains.forEach(function(x){if(x&&x.m&&!MAINS[x.m])MAINS[x.m]={c:x.c||'#666',subs:(x.subs&&x.subs.length?x.subs:['—'])}});ORDER=Object.keys(MAINS);}function save(){applyXmains();applyOvr();saveST();renderFilters();renderGrid();updCount();syncSrc()}
 document.querySelectorAll('header .btn[data-p]').forEach(b=>b.onclick=()=>setPreset(b.dataset.p));
 document.querySelectorAll('header .btn.src').forEach(b=>b.onclick=()=>{var d=b.dataset.s;ST.srcSet=ST.srcSet||{gen:1,epx:1,pag:1};if(d==='all'){ST.srcSet={gen:1,epx:1,pag:1}}else{ST.srcSet[d]=ST.srcSet[d]?0:1;if(!ST.srcSet.gen&&!ST.srcSet.epx&&!ST.srcSet.pag)ST.srcSet[d]=1}save()});
-document.getElementById('editBtn').onclick=function(){ST.edit=!ST.edit;document.body.classList.toggle('edit',ST.edit);this.classList.toggle('act',ST.edit)};var _ft=document.getElementById('filtToggle');if(_ft)_ft.onclick=function(){document.body.classList.toggle('showfilters');this.classList.toggle('act',document.body.classList.contains('showfilters'))};var _ob=document.getElementById('othBtn');if(_ob){if(TEAM==='admin'){_ob.style.display='none';}else{_ob.onclick=function(){ST.showOthers=!ST.showOthers;this.classList.toggle('act',ST.showOthers);if(ST.showOthers){['ΑΛ','ΟΠ','ΚΑ'].forEach(function(m){ST.fMain[m]=true;MAINS[m].subs.forEach(function(s){ST.fSub[m+':'+s]=true})});}else{setPreset(TEAM);}EXTRA=buildExtra();save();};}}var _hb=document.getElementById('helpBtn');if(_hb)_hb.onclick=showHelp;var _ac=document.getElementById('addCatBtn');if(_ac&&TEAM==='admin')_ac.onclick=function(){var nm=prompt('Όνομα νέας κατηγορίας:');if(!nm)return;nm=nm.trim();if(!nm||MAINS[nm]){alert('Άκυρο ή υπάρχει ήδη');return;}var col=(prompt('Χρώμα (hex):','#0E7C86')||'#666').trim();var sb=(prompt('Υποκατηγορίες (με κόμμα, ή κενό):','')||'').split(',').map(function(x){return x.trim()}).filter(Boolean);ST.xmains=ST.xmains||[];ST.xmains.push({m:nm,c:col,subs:sb.length?sb:['—']});ST.fMain[nm]=true;(sb.length?sb:['—']).forEach(function(x){ST.fSub[nm+':'+x]=true});save();};
+document.getElementById('editBtn').onclick=function(){ST.edit=!ST.edit;document.body.classList.toggle('edit',ST.edit);this.classList.toggle('act',ST.edit)};var _ft=document.getElementById('filtToggle');if(_ft)_ft.onclick=function(){document.body.classList.toggle('showfilters');this.classList.toggle('act',document.body.classList.contains('showfilters'))};var _ob=document.getElementById('othBtn');if(_ob){if(TEAM==='admin'){_ob.style.display='none';}else{_ob.onclick=function(){ST.showOthers=!ST.showOthers;this.classList.toggle('act',ST.showOthers);if(ST.showOthers){['ΑΛ','ΟΠ','ΚΑ'].forEach(function(m){ST.fMain[m]=true;MAINS[m].subs.forEach(function(s){ST.fSub[m+':'+s]=true})});}else{setPreset(TEAM);}EXTRA=buildExtra();save();};}}var _hb=document.getElementById('helpBtn');if(_hb)_hb.onclick=showHelp;var _ac=document.getElementById('addCatBtn');if(_ac&&TEAM==='admin')_ac.onclick=function(){var nm=prompt('Όνομα νέας κατηγορίας:');if(!nm)return;nm=nm.trim();if(!nm||MAINS[nm]){alert('Άκυρο ή υπάρχει ήδη');return;}var col=(prompt('Χρώμα (hex):','#0E7C86')||'#666').trim();var sb=(prompt('Υποκατηγορίες (με κόμμα, ή κενό):','')||'').split(',').map(function(x){return x.trim()}).filter(Boolean);ST.xmains=ST.xmains||[];ST.xmains.push({m:nm,c:col,subs:sb.length?sb:['—']});ST.fMain[nm]=true;(sb.length?sb:['—']).forEach(function(x){ST.fSub[nm+':'+x]=true});save();};var _asb=document.getElementById('allSygBtn');if(_asb&&TEAM==='admin')_asb.onclick=function(){var ks=[];BASE.forEach(function(m,mi){m.sats.forEach(function(sc,si){if(sc.date)ks.push(mi+'_'+si)})});ST.syg=ST.syg||{};var allset=ks.every(function(k){return ST.syg[k]});if(allset){ks.forEach(function(k){delete ST.syg[k]})}else{ks.forEach(function(k){if(!ST.syg[k])ST.syg[k]='syg'})}save();};
 function molaXlsx(){
  if(typeof XLSX==='undefined'){alert('Χρειάζεται σύνδεση internet για την εξαγωγή Excel.');return}
  const BORD={top:{style:'thin',color:{rgb:'999999'}},bottom:{style:'thin',color:{rgb:'999999'}},left:{style:'thin',color:{rgb:'999999'}},right:{style:'thin',color:{rgb:'999999'}}};
@@ -343,7 +344,31 @@ function molaXlsx(){
  ws['!merges']=merges;ws['!cols']=[{wch:12},{wch:23},{wch:23},{wch:23},{wch:23},{wch:23}];
  ws['!ref']=XLSX.utils.encode_range({s:{r:0,c:0},e:{r:vals.length-1,c:5}});
  ws['!pageSetup']={orientation:'landscape',fitToWidth:1,fitToHeight:0};
- const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Μόλα');
+ // ===== Sheet 2: Λίστα ανά κλιμάκιο (νέο layout, όπως Γενική/Επαρχία) =====
+ const COLS=ORDER.slice();const NC=2+COLS.length;
+ const v2=[],s2=[],mg2=[];let r2=0;const p2=(vr,sr)=>{v2.push(vr);s2.push(sr)};
+ var _tr=[];for(var _i=0;_i<NC;_i++)_tr.push(_i===0?'ΠΡΟΓΡΑΜΜΑ ΧΡΟΝΙΑΣ 2026–2027 — Λίστα ανά κλιμάκιο':'');
+ var _trs=[];for(var _i=0;_i<NC;_i++)_trs.push(_i===0?{font:{bold:true,sz:14},alignment:{vertical:'center'}}:{});
+ p2(_tr,_trs);mg2.push({s:{r:0,c:0},e:{r:0,c:NC-1}});r2=1;
+ var hv=['Μήνας','Ημ/νία'].concat(COLS);
+ var hs=[{font:{bold:true},border:BORD,fill:FILL('EFEFEF'),alignment:{horizontal:'center'}},{font:{bold:true},border:BORD,fill:FILL('EFEFEF'),alignment:{horizontal:'center'}}].concat(COLS.map(function(m){return {font:{bold:true,color:{rgb:(MAINS[m].c||'#333').replace('#','')}},border:BORD,fill:FILL('EFEFEF'),alignment:{horizontal:'center',wrapText:true}}}));
+ p2(hv,hs);r2++;
+ const note2=e=>{var t=e.t;if(e.dnote)t+=' ('+e.dnote+')';else if(e.nights>0){var sd=startDate(e);if(sd){var ed=new Date(sd);ed.setDate(ed.getDate()+e.nights);t+=' ('+sd.getDate()+'–'+ed.getDate()+'/'+(ed.getMonth()+1)+')';}}if(e.hours)t+=' '+e.hours;return t;};
+ BASE.forEach(function(m,mi){var mStart=r2,rows=0;
+  m.sats.forEach(function(sc,si){if(!sc.date)return;
+   var es=sc.entries.concat(ST.added.filter(x=>x.mi===mi&&x.si===si)).concat(EXTRA.filter(x=>x.mi===mi&&x.si===si)).concat((ST.syg&&ST.syg[mi+'_'+si])?[makeSyg(mi,si)]:[]).filter(e=>selected(e)&&visible(e));
+   var vr=[m.label.replace(' ','\n'),sc.date+'/'+MN[mi]];
+   var sr=[{font:{bold:true,sz:9},alignment:{horizontal:'center',vertical:'top',wrapText:true},border:BORD,fill:FILL('FFFFFF')},{font:{bold:true,sz:10,color:{rgb:'111111'}},alignment:{horizontal:'center',vertical:'top'},border:BORD,fill:FILL('FFFFFF')}];
+   COLS.forEach(function(mn){var items=es.filter(function(e){return tagsOf(e).some(function(t){return t.split(':')[0]===mn})}).map(note2);vr.push(items.join('\n'));sr.push({font:{sz:9,color:{rgb:(MAINS[mn].c||'#333').replace('#','')}},alignment:{vertical:'top',wrapText:true},border:BORD,fill:FILL('FFFFFF')});});
+   p2(vr,sr);r2++;rows++;});
+  if(rows>1)mg2.push({s:{r:mStart,c:0},e:{r:mStart+rows-1,c:0}});});
+ const ws2=XLSX.utils.aoa_to_sheet(v2);
+ for(let ri=0;ri<s2.length;ri++)for(let ci=0;ci<NC;ci++){const a=XLSX.utils.encode_cell({r:ri,c:ci});if(!ws2[a])ws2[a]={t:'s',v:''};if(s2[ri]&&s2[ri][ci])ws2[a].s=s2[ri][ci]}
+ ws2['!merges']=mg2;var cw=[{wch:12},{wch:9}];COLS.forEach(function(){cw.push({wch:20})});ws2['!cols']=cw;
+ ws2['!ref']=XLSX.utils.encode_range({s:{r:0,c:0},e:{r:v2.length-1,c:NC-1}});ws2['!pageSetup']={orientation:'landscape',fitToWidth:1,fitToHeight:0};
+ const wb=XLSX.utils.book_new();
+ XLSX.utils.book_append_sheet(wb,ws,'Πλέγμα (παλιό)');
+ XLSX.utils.book_append_sheet(wb,ws2,'Λίστα (νέο)');
  XLSX.writeFile(wb,'Μόλα 76 2026-2027 (επιλογή).xlsx');
 }
 function expJSON(){const blob=new Blob([JSON.stringify(ST)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mola_epilogi.json';a.click()}
@@ -355,7 +380,7 @@ if(RO){setPreset('all')}else if(TEAM!=='admin'&&!ST.preset){setPreset(TEAM)}
 if(TEAM!=='admin'&&!RO){['ΣΥΣΤΗΜΑ','ΑΡΓΙΕΣ','ΒΑΘΜΟΦΟΡΩΝ'].forEach(m=>{ST.fMain[m]=true;MAINS[m].subs.forEach(s=>ST.fSub[m+':'+s]=true)})}
 if(API_URL&&API_URL.indexOf("__API_URL__")<0)forceRead();
 try{document.getElementById('teamTag').textContent=' — '+(TEAM==='admin'?'Διαχειριστής':RO?'Προβολή (μόνο ανάγνωση)':'Τμήμα '+TEAM)}catch(e){}
-if(TEAM!=='admin'){['resetBtn','addCatBtn'].forEach(function(id){var b=document.getElementById(id);if(b)b.style.display='none'})}if(RO){['dbRow','adminTools'].forEach(function(id){var b=document.getElementById(id);if(b)b.style.display='none'})}
+if(TEAM!=='admin'){['resetBtn','addCatBtn','allSygBtn'].forEach(function(id){var b=document.getElementById(id);if(b)b.style.display='none'})}if(RO){['dbRow','adminTools'].forEach(function(id){var b=document.getElementById(id);if(b)b.style.display='none'})}
 save();
 function setStatus(t){var el=document.getElementById('saveStatus');if(el)el.textContent=t}
 function forceRead(){
@@ -379,17 +404,6 @@ function forceWrite(){
  var payload=JSON.stringify({team:TEAM,state:state});
  fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:payload}).then(function(){setStatus('Στάλθηκε ✓ — κάνε Force read για επιβεβαίωση')}).catch(function(){setStatus('Σφάλμα αποθήκευσης')});
 }
-</script>
-<script>
-/* Καθαρίζει το _gl (linker του Google Analytics) από τη διεύθυνση, ώστε ο
-   σύνδεσμος που αντιγράφει κανείς να μην κουβαλά αναγνωριστικό συσκευής.
-   Δεν αγγίζει καμία άλλη παράμετρο — το ?a= και το ?team= μένουν ακέραια. */
-(function(){try{
-  var u=new URL(location.href),n=0;
-  ["_gl","_ga"].forEach(function(k){ if(u.searchParams.has(k)){u.searchParams.delete(k);n++;} });
-  if(n){ var q=u.searchParams.toString();
-    history.replaceState(null,"",u.pathname+(q?"?"+q:"")+u.hash); }
-}catch(e){}})();
 </script>
 </body>
 </html>
