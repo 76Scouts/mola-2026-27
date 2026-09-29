@@ -157,7 +157,12 @@ const MAINS={
  'ΒΑΘΜΟΦΟΡΩΝ':{c:'#5E2A08',subs:['Συνάντηση','Εκπαίδευση','Εκδήλωση']}
 }
 let ORDER=Object.keys(MAINS);
-const API_URL="https://script.google.com/macros/s/AKfycbxTME66DDDOOdU5m__M-_EFjp_DivUchyvXba6DNOmoKD7pJ7lifTEIoJsNBtLANCyE/exec";var TEAM=(new URLSearchParams(location.search).get("team")||"admin");var TMAP={AL:"ΑΛ",OP:"ΟΠ",KA:"ΚΑ",ADMIN:"admin",admin:"admin"};TEAM=TMAP[TEAM]||TEAM;var RO=(TEAM==='view');var EXTRA=[];var POOLA=[],POOLT=[];function buildExtra(){return (TEAM==='admin'||RO)?POOLT.slice():POOLA.concat(ST.showOthers?POOLT:[]);}const MN=[9,10,11,12,1,2,3,4,5,6,7,8];const KINDS=[['syg','Συγκέντρωση'],['eid','Ειδική Συγκέντρωση'],['ekdil','Εκδήλωση'],['mono','Μονοήμερο'],['dihm','Διήμερο (1 βράδυ)'],['trihm','Τριήμερο (2 βράδια)'],['kat','Κατασκήνωση (7 βράδια)'],['allo','Άλλο (επιλογή βραδιών)']];const KINDN={syg:0,eid:0,ekdil:0,mono:0,dihm:1,trihm:2,kat:7,allo:0};function defKind(mn){return(mn==='ΑΛ'||mn==='ΟΠ'||mn==='ΚΑ')?'syg':(mn==='ΑΡΓΙΕΣ')?'':'ekdil';}var GIMAP={},_gi=0;BASE.forEach((m,mi)=>m.sats.forEach((s,si)=>{if(s.date)GIMAP[mi+'_'+si]=_gi++;}));var CELLDATE={};BASE.forEach((m,mi)=>m.sats.forEach((s,si)=>{if(s.date)CELLDATE[mi+'_'+si]=new Date(MN[mi]>=9?2026:2027,MN[mi]-1,parseInt(s.date,10));}));function parseDM(s){if(!s)return null;var p=(''+s).split('/');var d=parseInt(p[0],10),mo=parseInt(p[1],10);if(!d||!mo)return null;return new Date(mo>=9?2026:2027,mo-1,d);}function startDate(x){return parseDM(x.draw)||CELLDATE[x.mi+'_'+x.si]||null;}function findCell(e){if(e.mi!==undefined&&e.date)return{mi:e.mi,si:e.si,day:parseInt(e.date,10),mo:MN[e.mi]};for(var mi=0;mi<BASE.length;mi++){var st=BASE[mi].sats;for(var si=0;si<st.length;si++){if(st[si].entries.indexOf(e)>=0)return{mi:mi,si:si,day:parseInt(st[si].date,10),mo:MN[mi]};}}return null;}function weekDays(c){if(!c||!c.day)return[];var y=c.mo>=9?2026:2027,base=new Date(y,c.mo-1,c.day),g=['Κυρ','Δευ','Τρι','Τετ','Πεμ','Παρ','Σαβ'],out=[];for(var o=-4;o<=2;o++){var dt=new Date(base);dt.setDate(dt.getDate()+o);out.push({v:dt.getDate()+'/'+(dt.getMonth()+1),label:g[dt.getDay()]+' '+dt.getDate()+'/'+(dt.getMonth()+1)});}return out;}
+const API_URL="https://script.google.com/macros/s/AKfycbxTME66DDDOOdU5m__M-_EFjp_DivUchyvXba6DNOmoKD7pJ7lifTEIoJsNBtLANCyE/exec";var TEAM=(new URLSearchParams(location.search).get("team")||"admin");var TMAP={AL:"ΑΛ",OP:"ΟΠ",KA:"ΚΑ",ADMIN:"admin",admin:"admin"};TEAM=TMAP[TEAM]||TEAM;/* 29/09: ΠΑΡΑΘΥΡΟ ΣΤΟ e76. Η επεξεργασία γίνεται πλέον στο e76 (e.76.life → Πρόγραμμα χρονιάς).
+   Εδώ φαίνεται το ΕΤΗΣΙΟ πρόγραμμα (+ δημοσιευμένα) — ποτέ προσχέδια. Το «team» κρατά μόνο την άποψη. */
+var WIN=true;var RO=true;
+var E76_URL='https://cofiscmvdagizlchrian.supabase.co',E76_KEY='sb_publishable_OvYhjMAqZ9ty6T2De2by-g_uJ6mnm50',E76_YEAR='2026-27';
+var KIND_OF={'Συγκέντρωση':'syg','Ειδική Συγκέντρωση':'eid','Εκδήλωση':'ekdil','Μονοήμερο':'mono','Διήμερο':'dihm','Τριήμερο':'trihm','Κατασκήνωση':'kat','Άλλο':'allo'};
+var EXTRA=[];var POOLA=[],POOLT=[];function buildExtra(){return (TEAM==='admin'||RO)?POOLT.slice():POOLA.concat(ST.showOthers?POOLT:[]);}const MN=[9,10,11,12,1,2,3,4,5,6,7,8];const KINDS=[['syg','Συγκέντρωση'],['eid','Ειδική Συγκέντρωση'],['ekdil','Εκδήλωση'],['mono','Μονοήμερο'],['dihm','Διήμερο (1 βράδυ)'],['trihm','Τριήμερο (2 βράδια)'],['kat','Κατασκήνωση (7 βράδια)'],['allo','Άλλο (επιλογή βραδιών)']];const KINDN={syg:0,eid:0,ekdil:0,mono:0,dihm:1,trihm:2,kat:7,allo:0};function defKind(mn){return(mn==='ΑΛ'||mn==='ΟΠ'||mn==='ΚΑ')?'syg':(mn==='ΑΡΓΙΕΣ')?'':'ekdil';}var GIMAP={},_gi=0;BASE.forEach((m,mi)=>m.sats.forEach((s,si)=>{if(s.date)GIMAP[mi+'_'+si]=_gi++;}));var CELLDATE={};BASE.forEach((m,mi)=>m.sats.forEach((s,si)=>{if(s.date)CELLDATE[mi+'_'+si]=new Date(MN[mi]>=9?2026:2027,MN[mi]-1,parseInt(s.date,10));}));function parseDM(s){if(!s)return null;var p=(''+s).split('/');var d=parseInt(p[0],10),mo=parseInt(p[1],10);if(!d||!mo)return null;return new Date(mo>=9?2026:2027,mo-1,d);}function startDate(x){return parseDM(x.draw)||CELLDATE[x.mi+'_'+x.si]||null;}function findCell(e){if(e.mi!==undefined&&e.date)return{mi:e.mi,si:e.si,day:parseInt(e.date,10),mo:MN[e.mi]};for(var mi=0;mi<BASE.length;mi++){var st=BASE[mi].sats;for(var si=0;si<st.length;si++){if(st[si].entries.indexOf(e)>=0)return{mi:mi,si:si,day:parseInt(st[si].date,10),mo:MN[mi]};}}return null;}function weekDays(c){if(!c||!c.day)return[];var y=c.mo>=9?2026:2027,base=new Date(y,c.mo-1,c.day),g=['Κυρ','Δευ','Τρι','Τετ','Πεμ','Παρ','Σαβ'],out=[];for(var o=-4;o<=2;o++){var dt=new Date(base);dt.setDate(dt.getDate()+o);out.push({v:dt.getDate()+'/'+(dt.getMonth()+1),label:g[dt.getDay()]+' '+dt.getDate()+'/'+(dt.getMonth()+1)});}return out;}
 const LSK='mola7627v2';
 let ST={tags:{},off:{},added:[],fMain:{},fSub:{},edit:false,srcSet:{gen:1,epx:1,pag:1},ovr:{},del:{},syg:{},sygOff:{},xmains:[]};
 function loadST(){}
@@ -214,7 +219,7 @@ function renderGrid(){
    const cd=document.createElement('div');cd.className='cd';cd.innerHTML='<span>'+(s.date||'')+'</span>';
    const ab=document.createElement('button');ab.className='addb';ab.textContent='+';ab.title='Προσθήκη δράσης';ab.onclick=()=>addEntry(mi,si,s.date);if(!RO)cd.appendChild(ab);if(TEAM==='admin'&&s.date){var _k=mi+'_'+si;var _st=ST.syg&&ST.syg[_k];var sgb=document.createElement('button');sgb.className='addb';sgb.style.fontSize='12px';sgb.textContent=_st==='eid'?'Σ*':(_st==='syg'?'Σ':'＋Σ');sgb.title='Συγκέντρωση (—/Συγκ/Ειδική)';sgb.onclick=function(){ST.syg=ST.syg||{};var c=ST.syg[_k];if(!c)ST.syg[_k]='syg';else if(c==='syg')ST.syg[_k]='eid';else delete ST.syg[_k];save();};cd.appendChild(sgb);}
    cell.appendChild(cd);
-   const inSpan=x=>(x.mi===mi&&x.si===si);const list=s.entries.concat(ST.added.filter(inSpan)).concat(EXTRA.filter(inSpan));list.sort(function(a,b){if(!!a.syn!==!!b.syn)return a.syn?-1:1;var da=startDate(a),db=startDate(b);var ta=da?da.getTime():Infinity,tb=db?db.getTime():Infinity;if(ta!==tb)return ta-tb;return (a.src==='ΓΕ'?1:0)-(b.src==='ΓΕ'?1:0);});var _sk=mi+'_'+si;if(ST.syg&&ST.syg[_sk])list.unshift(makeSyg(mi,si));var _es=ST.syg&&ST.syg[_sk]&&!(ST.sygOff&&ST.sygOff[_sk]);var _hk=list.some(function(e){return e.kind==='kat'});if(s.date&&!_es&&!_hk)cell.style.background='#eeedea';
+   const inSpan=x=>(x.mi===mi&&x.si===si);const list=s.entries.concat(ST.added.filter(inSpan)).concat(EXTRA.filter(inSpan));list.sort(function(a,b){if(!!a.syn!==!!b.syn)return a.syn?-1:1;var da=startDate(a),db=startDate(b);var ta=da?da.getTime():Infinity,tb=db?db.getTime():Infinity;if(ta!==tb)return ta-tb;return (a.src==='ΓΕ'?1:0)-(b.src==='ΓΕ'?1:0);});var _sk=mi+'_'+si;if(ST.syg&&ST.syg[_sk])list.unshift(makeSyg(mi,si));var _es=ST.syg&&ST.syg[_sk]&&!(ST.sygOff&&ST.sygOff[_sk]);var _hk=list.some(function(e){return e.kind==='kat'});if(s.date&&!_es&&!_hk&&!WIN)cell.style.background='#eeedea';
    list.forEach(e=>{if(visible(e))cell.appendChild(entRow(e))});
    g.appendChild(cell);
   });
@@ -376,13 +381,30 @@ function impJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReader()
 function resetAll(){if(confirm('Επαναφορά όλων των επιλογών/κατηγοριών;')){localStorage.removeItem(LSK);location.reload()}}
 if(ST.edit){document.body.classList.add('edit');document.getElementById('editBtn').classList.add('act')}
 if(ST.preset){document.querySelectorAll('header .btn[data-p]').forEach(b=>b.classList.toggle('act',b.dataset.p===ST.preset))}
-if(RO){setPreset('all')}else if(TEAM!=='admin'&&!ST.preset){setPreset(TEAM)}
+if(TEAM==='ΑΛ'||TEAM==='ΟΠ'||TEAM==='ΚΑ'){setPreset(TEAM)}else{setPreset('all')}
 if(TEAM!=='admin'&&!RO){['ΣΥΣΤΗΜΑ','ΑΡΓΙΕΣ','ΒΑΘΜΟΦΟΡΩΝ'].forEach(m=>{ST.fMain[m]=true;MAINS[m].subs.forEach(s=>ST.fSub[m+':'+s]=true)})}
-if(API_URL&&API_URL.indexOf("__API_URL__")<0)forceRead();
-try{document.getElementById('teamTag').textContent=' — '+(TEAM==='admin'?'Διαχειριστής':RO?'Προβολή (μόνο ανάγνωση)':'Τμήμα '+TEAM)}catch(e){}
+loadE76();
+try{document.getElementById('teamTag').textContent=' — Ετήσιο πρόγραμμα από το e76 (μόνο ανάγνωση)'+(TEAM==='ΑΛ'||TEAM==='ΟΠ'||TEAM==='ΚΑ'?' · άποψη '+TEAM:'')}catch(e){}
 if(TEAM!=='admin'){['resetBtn','addCatBtn','allSygBtn'].forEach(function(id){var b=document.getElementById(id);if(b)b.style.display='none'})}if(RO){['dbRow','adminTools'].forEach(function(id){var b=document.getElementById(id);if(b)b.style.display='none'})}
 save();
 function setStatus(t){var el=document.getElementById('saveStatus');if(el)el.textContent=t}
+/* ── ΑΠΟ ΤΟ e76 (29/09) ── mola_window(): ΜΟΝΟ Ετήσιο + Δημοσιευμένο, μόνο τίτλος/ημερομηνίες/είδος/ετικέτες. */
+function e76Cell(iso){var d=new Date(iso+'T12:00:00');var dw=d.getDay();d.setDate(d.getDate()+(dw<=1?-(dw+1):(6-dw)));
+ for(var mi=0;mi<BASE.length;mi++){if(MN[mi]!==d.getMonth()+1)continue;var st=BASE[mi].sats;for(var si=0;si<st.length;si++){if(parseInt(st[si].date,10)===d.getDate())return{mi:mi,si:si,date:st[si].date,sat:d}}}return null}
+function e76Entry(r){if(!r.event_date)return null;var c=e76Cell(r.event_date);if(!c)return null;var d=new Date(r.event_date+'T12:00:00');
+ var tags=(r.tags&&r.tags.length)?r.tags:['ΣΥΣΤΗΜΑ:Σημαντικά'];var up=(r.level==='Γενική Εφορεία'||r.level==='Επαρχιακή Εφορεία'||tags.some(function(t){return t.split(':')[0]==='ΑΡΓΙΕΣ'}));
+ var e={id:'e76:'+r.id,t:r.title,tags:tags,b:!!r.bold,src:up?'ΓΕ':'ΤΜΗΜΑ',mi:c.mi,si:c.si,date:c.date,nights:r.nights||0,kind:KIND_OF[r.type]||'',hours:r.hours||'',owner:r.section||'ΠΑΓΙΟ',fromTeam:true,stage:r.stage};
+ e.draw=d.getDate()+'/'+(d.getMonth()+1);if(d.getDate()!==c.sat.getDate()||r.nights)e.dnote=molaDay(e.draw);return e}
+function loadE76(){
+ setStatus('Ανάγνωση από το e76…');
+ fetch(E76_URL+'/rest/v1/rpc/mola_window',{method:'POST',headers:{'apikey':E76_KEY,'Authorization':'Bearer '+E76_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_year:E76_YEAR})})
+ .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+ .then(function(rows){BASE.forEach(function(m){m.sats.forEach(function(sc){sc.entries=[]})});ST.added=[];ST.syg={};ST.del={};ST.ovr={};POOLA=[];POOLT=[];
+   EXTRA=(rows||[]).map(e76Entry).filter(Boolean);var n=(rows||[]).filter(function(x){return x.stage==='annual'}).length;
+   save();var tg=document.getElementById('teamTag');if(tg)tg.textContent=' — Ετήσιο πρόγραμμα από το e76 · '+EXTRA.length+' εγγραφές'+(n?' ('+n+' ακόμη προσωρινές)':'')+' · '+new Date().toLocaleTimeString('el-GR',{hour:'2-digit',minute:'2-digit'});})
+ .catch(function(e){var tg=document.getElementById('teamTag');if(tg)tg.textContent=' — ⚠ Δεν διαβάστηκε το e76 ('+e.message+')';});
+}
+
 function forceRead(){
  if(!API_URL||API_URL.indexOf('__API_URL__')>=0){setStatus('⚠ Όρισε το API_URL στο αρχείο');return;}
  setStatus('Ανάγνωση…');
