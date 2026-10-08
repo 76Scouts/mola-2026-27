@@ -158,6 +158,9 @@ let ORDER=Object.keys(MAINS);
 var TEAM=(new URLSearchParams(location.search).get("team")||"admin");var TMAP={AL:"ΑΛ",OP:"ΟΠ",KA:"ΚΑ",ADMIN:"admin",admin:"admin"};TEAM=TMAP[TEAM]||TEAM;/* 29/09: ΠΑΡΑΘΥΡΟ ΣΤΟ e76. Η επεξεργασία γίνεται πλέον στο e76 (e.76.life → Πρόγραμμα χρονιάς).
    Εδώ φαίνεται το ΕΤΗΣΙΟ πρόγραμμα (+ δημοσιευμένα) — ποτέ προσχέδια. Το «team» κρατά μόνο την άποψη. */
 var WIN=true;var RO=true;
+/* 08/10: ΠΑΝΩ-ΠΑΝΩ — το renderGrid τρέχει πριν φτάσει ο κώδικας στο loadE76. */
+var SESS={};var SES_SEC={'Αγέλη':['ΑΛ','#8F6B00'],'Ομάδα':['ΟΠ','#3D5F26'],'Κοινότητα':['ΚΑ','#900000'],'Σύστημα':['ΣΥΣ','#15558F']};
+var CAL_L={sys:'Σύστημα',staff:'Επιτελείο',open:'Φίλοι'};
 var E76_URL='https://cofiscmvdagizlchrian.supabase.co',E76_KEY='sb_publishable_OvYhjMAqZ9ty6T2De2by-g_uJ6mnm50',E76_YEAR='2026-27';
 var KIND_OF={'Συγκέντρωση':'syg','Ειδική Συγκέντρωση':'eid','Εκδήλωση':'ekdil','Μονοήμερο':'mono','Διήμερο':'dihm','Τριήμερο':'trihm','Κατασκήνωση':'kat','Άλλο':'allo'};
 var EXTRA=[];var POOLA=[],POOLT=[];function buildExtra(){return (TEAM==='admin'||RO)?POOLT.slice():POOLA.concat(ST.showOthers?POOLT:[]);}const MN=[9,10,11,12,1,2,3,4,5,6,7,8];const KINDS=[['syg','Συγκέντρωση'],['eid','Ειδική Συγκέντρωση'],['ekdil','Εκδήλωση'],['mono','Μονοήμερο'],['dihm','Διήμερο (1 βράδυ)'],['trihm','Τριήμερο (2 βράδια)'],['kat','Κατασκήνωση (7 βράδια)'],['allo','Άλλο (επιλογή βραδιών)']];const KINDN={syg:0,eid:0,ekdil:0,mono:0,dihm:1,trihm:2,kat:7,allo:0};function defKind(mn){return(mn==='ΑΛ'||mn==='ΟΠ'||mn==='ΚΑ')?'syg':(mn==='ΑΡΓΙΕΣ')?'':'ekdil';}var GIMAP={},_gi=0;BASE.forEach((m,mi)=>m.sats.forEach((s,si)=>{if(s.date)GIMAP[mi+'_'+si]=_gi++;}));var CELLDATE={};BASE.forEach((m,mi)=>m.sats.forEach((s,si)=>{if(s.date)CELLDATE[mi+'_'+si]=new Date(MN[mi]>=9?2026:2027,MN[mi]-1,parseInt(s.date,10));}));function parseDM(s){if(!s)return null;var p=(''+s).split('/');var d=parseInt(p[0],10),mo=parseInt(p[1],10);if(!d||!mo)return null;return new Date(mo>=9?2026:2027,mo-1,d);}function startDate(x){return parseDM(x.draw)||CELLDATE[x.mi+'_'+x.si]||null;}function findCell(e){if(e.mi!==undefined&&e.date)return{mi:e.mi,si:e.si,day:parseInt(e.date,10),mo:MN[e.mi]};for(var mi=0;mi<BASE.length;mi++){var st=BASE[mi].sats;for(var si=0;si<st.length;si++){if(st[si].entries.indexOf(e)>=0)return{mi:mi,si:si,day:parseInt(st[si].date,10),mo:MN[mi]};}}return null;}function weekDays(c){if(!c||!c.day)return[];var y=c.mo>=9?2026:2027,base=new Date(y,c.mo-1,c.day),g=['Κυρ','Δευ','Τρι','Τετ','Πεμ','Παρ','Σαβ'],out=[];for(var o=-4;o<=2;o++){var dt=new Date(base);dt.setDate(dt.getDate()+o);out.push({v:dt.getDate()+'/'+(dt.getMonth()+1),label:g[dt.getDay()]+' '+dt.getDate()+'/'+(dt.getMonth()+1)});}return out;}
@@ -399,12 +402,10 @@ function e76Entry(r){if(!r.event_date)return null;var c=e76Cell(r.event_date);if
  var tags=(r.tags&&r.tags.length)?r.tags:['ΣΥΣΤΗΜΑ:Σημαντικά'];var up=(r.level==='Γενική Εφορεία'||r.level==='Επαρχιακή Εφορεία'||tags.some(function(t){return t.split(':')[0]==='ΑΡΓΙΕΣ'}));
  var e={id:'e76:'+r.id,t:r.title,tags:tags,b:!!r.bold,src:up?'ΓΕ':'ΤΜΗΜΑ',mi:c.mi,si:c.si,date:c.date,nights:r.nights||0,kind:KIND_OF[r.type]||'',hours:r.hours||'',owner:r.section||'ΠΑΓΙΟ',fromTeam:true,stage:r.stage,mine:!up,cal:r.cal||[]};
  e.draw=d.getDate()+'/'+(d.getMonth()+1);if(d.getDate()!==c.sat.getDate()||r.nights)e.dnote=molaDay(e.draw);return e}
-var SESS={};var SES_SEC={'Αγέλη':['ΑΛ','#8F6B00'],'Ομάδα':['ΟΠ','#3D5F26'],'Κοινότητα':['ΚΑ','#900000'],'Σύστημα':['ΣΥΣ','#15558F']};
 function sesLetter(k){k=String(k||'').toLowerCase();return k.indexOf('ειδ')===0?'Ε':k.indexOf('δρ')===0?'Δ':'Σ'}
 function sesHTML(key){var L=SESS[key];if(!L)return '';var order=['Σύστημα','Αγέλη','Ομάδα','Κοινότητα'];
  return '<span class="sesc">'+order.filter(function(x){return L[x]}).map(function(x){var c=SES_SEC[x];var l=sesLetter(L[x]);
   return '<b style="background:'+c[1]+'" title="'+x+': '+L[x]+'">'+c[0]+(l==='Σ'?'':' '+l)+'</b>'}).join('')+'</span>'}
-var CAL_L={sys:'Σύστημα',staff:'Επιτελείο',open:'Φίλοι'};
 /* 08/10: mola_feed() = ίδιο παράθυρο + στάδιο + ημερολόγια + συγκεντρώσεις τμημάτων. */
 function loadE76(){
  setStatus('Ανάγνωση από το e76…');
