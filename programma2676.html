@@ -43,6 +43,16 @@ aside{width:210px;flex:none;padding:12px;position:sticky;top:80px;max-height:cal
 .ent.off .lab{opacity:.32;text-decoration:line-through}
 .ent input{margin:2px 0 0;flex:none}
 .lab{cursor:pointer;flex:1;min-width:0;overflow-wrap:anywhere}
+.sesc{display:inline-flex;gap:2px;margin-left:auto;padding-left:6px}
+.sesc b{font-size:8.5px;line-height:13px;padding:0 3px;border-radius:3px;color:#fff;font-weight:700;letter-spacing:.02em}
+.cell.nosyg{background:#f3f2ee}
+.cell.nosyg .cd span:first-child{color:#9a9a92}
+.stg{font-size:8.5px;padding:0 4px;border-radius:8px;margin:2px 0 0 3px;white-space:nowrap;display:inline-block;vertical-align:1px}
+.stg.pub{background:#e3f1e0;color:#2f6b25}
+.stg.ann{border:1px dashed #9a9a92;color:#6b6b63}
+.calb{font-size:10px;margin-left:3px;vertical-align:0}
+.legend{font-size:11.5px;color:var(--mut);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.legend b.k{font-size:8.5px;padding:0 3px;border-radius:3px;color:#fff}
 .chip{font-size:9px;padding:0 4px;border:1px solid;border-radius:8px;margin:2px 0 0 3px;white-space:nowrap;display:inline-block;vertical-align:1px}
 .pen{cursor:pointer;color:var(--mut);font-size:13px;padding:0 4px;visibility:visible}
 body.edit .pen{visibility:visible}
@@ -109,14 +119,11 @@ select,input[type=text]{padding:5px 7px;border:1px solid var(--bd);border-radius
   <button class="btn" id="helpBtn" title="Πώς δουλεύει το εργαλείο">ℹ Οδηγίες</button>
   <span class="count" id="count"></span>
  </div>
- <div class="row" id="dbRow" style="margin-top:8px">
-  <span class="gl">Βάση:</span>
-  <button class="btn" onclick="forceRead()">⟳ Force read</button>
-  <button class="btn pri" id="fwBtn" onclick="forceWrite()">💾 Force write</button>
-  <button class="btn teamonly" id="othBtn" title="Προβολή δράσεων άλλων τμημάτων (read-only)">👁 Άλλα τμήματα</button>
-  <span id="saveStatus" style="color:var(--mut);font-size:12px"></span>
-  <span class="sep"></span>
-  <button class="btn" id="editBtn">✎ Επεξεργασία κατηγοριών</button>
+ <div class="row legend" style="margin-top:8px">
+  <span><span class="stg pub">✓ δημοσιευμένο</span></span>
+  <span><span class="stg ann">προσωρινό</span> = Ετήσιο, μπορεί ακόμα να αλλάξει</span>
+  <span>📅 = σε ημερολόγιο Google</span>
+  <span>Σάββατο: <b class="k" style="background:#8F6B00">ΑΛ</b> <b class="k" style="background:#3D5F26">ΟΠ</b> <b class="k" style="background:#900000">ΚΑ</b> = συγκέντρωση τμήματος (Σ · Ε ειδική · Δ δράση) · γκρι = καμία</span>
  </div>
  <div class="row" style="margin-top:6px">
   <span class="gl">Εκτύπωση / Export:</span>
@@ -126,15 +133,6 @@ select,input[type=text]{padding:5px 7px;border:1px solid var(--bd);border-radius
   <span class="sep"></span>
   <button class="btn" onclick="window.print()">🖨 Εκτύπωση επιλογής</button>
   <button class="btn pri" onclick="molaXlsx()">⬇ Excel (.xlsx)</button>
- </div>
- <div class="row" id="adminTools" style="margin-top:6px">
-  <span class="gl">Αντίγραφο:</span>
-  <button class="btn" onclick="expJSON()">⬇ Αποθήκευση .json</button>
-  <button class="btn" onclick="document.getElementById('imp').click()">⬆ Εισαγωγή .json</button>
-  <input id="imp" type="file" accept=".json" style="display:none" onchange="impJSON(this)">
-  <button class="btn" id="allSygBtn" title="Βάλε/βγάλε Συγκέντρωση σε όλα τα Σάββατα">Σ όλα τα ΣΚ</button>
-  <button class="btn" id="addCatBtn">＋ Κατηγορία</button>
-  <button class="btn" id="resetBtn" onclick="resetAll()">↺ Επαναφορά</button>
  </div>
 </header>
 <main>
@@ -157,7 +155,7 @@ const MAINS={
  'ΒΑΘΜΟΦΟΡΩΝ':{c:'#5E2A08',subs:['Συνάντηση','Εκπαίδευση','Εκδήλωση']}
 }
 let ORDER=Object.keys(MAINS);
-const API_URL="https://script.google.com/macros/s/AKfycbxTME66DDDOOdU5m__M-_EFjp_DivUchyvXba6DNOmoKD7pJ7lifTEIoJsNBtLANCyE/exec";var TEAM=(new URLSearchParams(location.search).get("team")||"admin");var TMAP={AL:"ΑΛ",OP:"ΟΠ",KA:"ΚΑ",ADMIN:"admin",admin:"admin"};TEAM=TMAP[TEAM]||TEAM;/* 29/09: ΠΑΡΑΘΥΡΟ ΣΤΟ e76. Η επεξεργασία γίνεται πλέον στο e76 (e.76.life → Πρόγραμμα χρονιάς).
+var TEAM=(new URLSearchParams(location.search).get("team")||"admin");var TMAP={AL:"ΑΛ",OP:"ΟΠ",KA:"ΚΑ",ADMIN:"admin",admin:"admin"};TEAM=TMAP[TEAM]||TEAM;/* 29/09: ΠΑΡΑΘΥΡΟ ΣΤΟ e76. Η επεξεργασία γίνεται πλέον στο e76 (e.76.life → Πρόγραμμα χρονιάς).
    Εδώ φαίνεται το ΕΤΗΣΙΟ πρόγραμμα (+ δημοσιευμένα) — ποτέ προσχέδια. Το «team» κρατά μόνο την άποψη. */
 var WIN=true;var RO=true;
 var E76_URL='https://cofiscmvdagizlchrian.supabase.co',E76_KEY='sb_publishable_OvYhjMAqZ9ty6T2De2by-g_uJ6mnm50',E76_YEAR='2026-27';
@@ -216,10 +214,10 @@ function renderGrid(){
   m.sats.forEach((s,si)=>{
    if(!s.date)return;
    const cell=document.createElement('div');cell.className='cell';
-   const cd=document.createElement('div');cd.className='cd';cd.innerHTML='<span>'+(s.date||'')+'</span>';
+   const cd=document.createElement('div');cd.className='cd';cd.innerHTML='<span>'+(s.date||'')+'</span>'+sesHTML(mi+'_'+si);
    const ab=document.createElement('button');ab.className='addb';ab.textContent='+';ab.title='Προσθήκη δράσης';ab.onclick=()=>addEntry(mi,si,s.date);if(!RO)cd.appendChild(ab);if(TEAM==='admin'&&s.date){var _k=mi+'_'+si;var _st=ST.syg&&ST.syg[_k];var sgb=document.createElement('button');sgb.className='addb';sgb.style.fontSize='12px';sgb.textContent=_st==='eid'?'Σ*':(_st==='syg'?'Σ':'＋Σ');sgb.title='Συγκέντρωση (—/Συγκ/Ειδική)';sgb.onclick=function(){ST.syg=ST.syg||{};var c=ST.syg[_k];if(!c)ST.syg[_k]='syg';else if(c==='syg')ST.syg[_k]='eid';else delete ST.syg[_k];save();};cd.appendChild(sgb);}
    cell.appendChild(cd);
-   const inSpan=x=>(x.mi===mi&&x.si===si);const list=s.entries.concat(ST.added.filter(inSpan)).concat(EXTRA.filter(inSpan));list.sort(function(a,b){if(!!a.syn!==!!b.syn)return a.syn?-1:1;var da=startDate(a),db=startDate(b);var ta=da?da.getTime():Infinity,tb=db?db.getTime():Infinity;if(ta!==tb)return ta-tb;return (a.src==='ΓΕ'?1:0)-(b.src==='ΓΕ'?1:0);});var _sk=mi+'_'+si;if(ST.syg&&ST.syg[_sk])list.unshift(makeSyg(mi,si));var _es=ST.syg&&ST.syg[_sk]&&!(ST.sygOff&&ST.sygOff[_sk]);var _hk=list.some(function(e){return e.kind==='kat'});if(s.date&&!_es&&!_hk&&!WIN)cell.style.background='#eeedea';
+   const inSpan=x=>(x.mi===mi&&x.si===si);const list=s.entries.concat(ST.added.filter(inSpan)).concat(EXTRA.filter(inSpan));list.sort(function(a,b){if(!!a.syn!==!!b.syn)return a.syn?-1:1;var da=startDate(a),db=startDate(b);var ta=da?da.getTime():Infinity,tb=db?db.getTime():Infinity;if(ta!==tb)return ta-tb;return (a.src==='ΓΕ'?1:0)-(b.src==='ΓΕ'?1:0);});var _sk=mi+'_'+si;if(ST.syg&&ST.syg[_sk])list.unshift(makeSyg(mi,si));var _es=ST.syg&&ST.syg[_sk]&&!(ST.sygOff&&ST.sygOff[_sk]);var _hk=list.some(function(e){return e.kind==='kat'});if(s.date&&!SESS[_sk]&&!_hk){cell.classList.add('nosyg');cell.title='Καμία συγκέντρωση τμήματος αυτό το Σάββατο'}
    list.forEach(e=>{if(visible(e))cell.appendChild(entRow(e))});
    g.appendChild(cell);
   });
@@ -233,7 +231,7 @@ function entRow(e){
  cb.onchange=()=>{if(cb.checked)delete ST.off[e.id];else ST.off[e.id]=1;save()};
  const lab=document.createElement('span');lab.className='lab';lab.style.color=mainColor(e);if(isBold(e))lab.style.fontWeight='600';lab.style.fontSize=sizeFor(e)+'px';
  lab.appendChild(document.createTextNode(e.t));var _rng='';if(e.nights>0){var _sd=startDate(e);if(_sd){var _ed=new Date(_sd);_ed.setDate(_ed.getDate()+e.nights);_rng=_sd.getDate()+(_sd.getMonth()!==_ed.getMonth()?'/'+(_sd.getMonth()+1):'')+'–'+_ed.getDate()+'/'+(_ed.getMonth()+1);}}var _dd=(e.nights>0&&_rng)?_rng:e.dnote;var _nt=[_dd,(e.kind==='eid'?'ειδ.':''),e.hours].filter(Boolean).join(' · ');if(_nt){var dn=document.createElement('span');dn.style.color='var(--mut)';dn.style.fontSize='10px';dn.textContent=' · '+_nt;lab.appendChild(dn)}
- var _tm=[];tagsOf(e).forEach(function(t){var m=t.split(':')[0];if((m==='ΑΛ'||m==='ΟΠ'||m==='ΚΑ')&&_tm.indexOf(m)<0)_tm.push(m)});if(_tm.length>1){var kb=document.createElement('span');kb.className='chip';kb.style.color='#5A5A5A';kb.style.borderColor='#5A5A5A';kb.textContent='κοινό';lab.appendChild(kb);} tagsOf(e).forEach(tg=>{const[mm,ss]=tg.split(':');const ch=document.createElement('span');ch.className='chip';ch.style.color=MAINS[mm].c;ch.style.borderColor=MAINS[mm].c;ch.textContent=mm+(ss&&ss!=='—'?'·'+ss:'');lab.appendChild(ch)});
+ var _tm=[];tagsOf(e).forEach(function(t){var m=t.split(':')[0];if((m==='ΑΛ'||m==='ΟΠ'||m==='ΚΑ')&&_tm.indexOf(m)<0)_tm.push(m)});if(_tm.length>1){var kb=document.createElement('span');kb.className='chip';kb.style.color='#5A5A5A';kb.style.borderColor='#5A5A5A';kb.textContent='κοινό';lab.appendChild(kb);} tagsOf(e).forEach(tg=>{const[mm,ss]=tg.split(':');const ch=document.createElement('span');ch.className='chip';ch.style.color=MAINS[mm].c;ch.style.borderColor=MAINS[mm].c;ch.textContent=mm+(ss&&ss!=='—'?'·'+ss:'');lab.appendChild(ch)});if(e.mine&&e.stage){var sg=document.createElement('span');sg.className='stg '+(e.stage==='published'?'pub':'ann');sg.textContent=e.stage==='published'?'✓':'προσωρινό';sg.title=e.stage==='published'?'Δημοσιευμένο — ανακοινώθηκε':'Ετήσιο πρόγραμμα — μπορεί ακόμα να αλλάξει';lab.appendChild(sg)}if(e.cal&&e.cal.length){var cb2=document.createElement('span');cb2.className='calb';cb2.textContent='📅';cb2.title='Στο ημερολόγιο Google: '+e.cal.map(function(k){return CAL_L[k]||k}).join(', ');lab.appendChild(cb2)}
  lab.onclick=()=>{if(ST.edit)openEdit(e);else{cb.checked=!cb.checked;cb.onchange()}};
  const pen=document.createElement('span');pen.className='pen';pen.textContent='✎';pen.onclick=()=>openEdit(e);
  row.appendChild(cb);row.appendChild(lab);if(!RO)row.appendChild(pen);
@@ -266,7 +264,13 @@ function openEdit(e){if(RO)return;
  }
  draw();document.getElementById('modal').classList.add('on');
 }
-function showHelp(){var b=document.getElementById('modalBox');b.innerHTML='<h3>\u2139 \u039f\u03b4\u03b7\u03b3\u03af\u03b5\u03c2 \u2014 \u039c\u03cc\u03bb\u03b1 76</h3>'+'<div style="font-size:13px;line-height:1.5;color:#222">'+'<p><b>\u03a4\u03b9 \u03b5\u03af\u03bd\u03b1\u03b9:</b> \u03c4\u03bf \u03b6\u03c9\u03bd\u03c4\u03b1\u03bd\u03cc \u03a0\u03c1\u03cc\u03b3\u03c1\u03b1\u03bc\u03bc\u03b1 \u03a7\u03c1\u03bf\u03bd\u03b9\u03ac\u03c2 \u03c4\u03bf\u03c5 \u03a3\u03ce\u03bc\u03b1\u03c4\u03bf\u03c2 (\u03bc\u03ae\u03bd\u03b5\u03c2 \u00d7 \u03a3\u03ac\u03b2\u03b2\u03b1\u03c4\u03b1).</p>'+'<p><b>\u03a4\u03b9 \u03b2\u03bb\u03ad\u03c0\u03b5\u03b9\u03c2/\u03b1\u03bb\u03bb\u03ac\u03b6\u03b5\u03b9\u03c2:</b> \u03ba\u03ac\u03b8\u03b5 link (\u03a3\u03cd\u03c3\u03c4\u03b7\u03bc\u03b1/\u0391\u03b3\u03ad\u03bb\u03b7/\u039f\u03bc\u03ac\u03b4\u03b1/\u039a\u03bf\u03b9\u03bd\u03cc\u03c4\u03b7\u03c4\u03b1) \u03b2\u03bb\u03ad\u03c0\u03b5\u03b9 \u03c4\u03b1 \u03b4\u03b9\u03ba\u03ac \u03c4\u03bf\u03c5 + \u03c4\u03b1 \u03ba\u03bf\u03b9\u03bd\u03ac (\u03a3\u03cd\u03c3\u03c4\u03b7\u03bc\u03b1, \u0393\u03b5\u03bd\u03b9\u03ba\u03ae, \u0395\u03c0\u03b1\u03c1\u03c7\u03af\u03b1, \u03a3\u03c7\u03bf\u03bb\u03ad\u03c2, \u0391\u03c1\u03b3\u03af\u03b5\u03c2, \u0392\u03b1\u03b8\u03bc\u03bf\u03c6\u03cc\u03c1\u03c9\u03bd). \u0395\u03c0\u03b5\u03be\u03b5\u03c1\u03b3\u03ac\u03b6\u03b5\u03c3\u03b1\u03b9 <b>\u03bc\u03cc\u03bd\u03bf \u03c4\u03b9\u03c2 \u03b4\u03b9\u03ba\u03ad\u03c2 \u03c3\u03bf\u03c5</b> (\u03ba\u03b1\u03b9 \u03c4\u03b9\u03c2 \u03ba\u03bf\u03b9\u03bd\u03ad\u03c2 \u03c0\u03bf\u03bb\u03c5\u03c4\u03bc\u03b7\u03bc\u03b1\u03c4\u03b9\u03ba\u03ad\u03c2)\u00b7 \u03c4\u03b1 \u03c5\u03c0\u03cc\u03bb\u03bf\u03b9\u03c0\u03b1 read-only.</p>'+'<p><b>\u03a0\u03c1\u03bf\u03c3\u03b8\u03ae\u03ba\u03b7:</b> \uff0b \u03c0\u03ac\u03bd\u03c9 \u03c3\u03c4\u03bf \u03a3\u03ac\u03b2\u03b2\u03b1\u03c4\u03bf \u2192 \u03c4\u03af\u03c4\u03bb\u03bf\u03c2, \u03ba\u03b1\u03c4\u03b7\u03b3\u03bf\u03c1\u03af\u03b1, \u03b7\u03bc\u03b5\u03c1\u03bf\u03bc\u03b7\u03bd\u03af\u03b1, \u03a4\u03cd\u03c0\u03bf\u03c2, \u03b2\u03c1\u03ac\u03b4\u03b9\u03b1, \u03ce\u03c1\u03b5\u03c2. <b>\u0391\u03bb\u03bb\u03b1\u03b3\u03ae/\u03b4\u03b9\u03b1\u03b3\u03c1\u03b1\u03c6\u03ae:</b> \u270e \u03b4\u03af\u03c0\u03bb\u03b1 \u03c3\u03b5 \u03ba\u03ac\u03b8\u03b5 \u03b4\u03c1\u03ac\u03c3\u03b7.</p>'+'<p><b>\u0391\u03c0\u03bf\u03b8\u03ae\u03ba\u03b5\u03c5\u03c3\u03b7:</b> \u00ab\ud83d\udcbe Force write\u00bb \u03b1\u03bd\u03b5\u03b2\u03ac\u03b6\u03b5\u03b9 <b>\u03bc\u03cc\u03bd\u03bf \u03c4\u03b1 \u03b4\u03b9\u03ba\u03ac \u03c3\u03bf\u03c5</b> \u2014 \u03b4\u03b5\u03bd \u03c3\u03b2\u03ae\u03bd\u03b5\u03b9\u03c2 \u03ac\u03bb\u03bb\u03b1 \u03c4\u03bc\u03ae\u03bc\u03b1\u03c4\u03b1. \u00ab\u27f3 Force read\u00bb \u03c6\u03ad\u03c1\u03bd\u03b5\u03b9 \u03c4\u03b7\u03bd \u03c4\u03b5\u03bb\u03b5\u03c5\u03c4\u03b1\u03af\u03b1 \u03ad\u03ba\u03b4\u03bf\u03c3\u03b7. <b>\u0391\u03c3\u03c6\u03b1\u03bb\u03ae\u03c2 \u03c3\u03b5\u03b9\u03c1\u03ac: Force read \u2192 \u03b1\u03bb\u03bb\u03b1\u03b3\u03ad\u03c2 \u2192 Force write.</b></p>'+'<p><b>\ud83d\udc41 \u0386\u03bb\u03bb\u03b1 \u03c4\u03bc\u03ae\u03bc\u03b1\u03c4\u03b1:</b> \u03c0\u03c1\u03bf\u03b2\u03bf\u03bb\u03ae (read-only) \u03c4\u03c9\u03bd \u03b4\u03c1\u03ac\u03c3\u03b5\u03c9\u03bd \u03c4\u03c9\u03bd \u03ac\u03bb\u03bb\u03c9\u03bd \u03c4\u03bc\u03b7\u03bc\u03ac\u03c4\u03c9\u03bd.</p>'+'<p><b>\u03a6\u03af\u03bb\u03c4\u03c1\u03b1 (\u03b1\u03c1\u03b9\u03c3\u03c4\u03b5\u03c1\u03ac):</b> \u03b4\u03b9\u03ac\u03bb\u03b5\u03be\u03b5 \u03c4\u03b9 \u03b5\u03bc\u03c6\u03b1\u03bd\u03af\u03b6\u03b5\u03c4\u03b1\u03b9\u00b7 \u00ab\u039a\u03b1\u03bc\u03af\u03b1\u00bb \u03b3\u03b9\u03b1 opt-in.</p>'+'<p><b>\u0395\u03ba\u03c4\u03cd\u03c0\u03c9\u03c3\u03b7 / Excel:</b> \u03c4\u03c3\u03ad\u03ba\u03b1\u03c1\u03b5 \u03c4\u03b9 \u03bc\u03c0\u03b1\u03af\u03bd\u03b5\u03b9, \u03bc\u03b5\u03c4\u03ac \ud83d\udda8 \u03ae \u2b07 Excel. \u03a7\u03c1\u03ce\u03bc\u03b1 = \u03ba\u03b1\u03c4\u03b7\u03b3\u03bf\u03c1\u03af\u03b1.</p>'+'</div>';var f=document.createElement('div');f.className='row';f.style.justifyContent='flex-end';f.style.marginTop='10px';var ok=document.createElement('button');ok.className='btn pri';ok.textContent='\u039a\u03bb\u03b5\u03af\u03c3\u03b9\u03bc\u03bf';ok.onclick=close;f.appendChild(ok);b.appendChild(f);document.getElementById('modal').classList.add('on');}
+function showHelp(){var b=document.getElementById('modalBox');b.innerHTML='<h3>ℹ Οδηγίες — Μόλα 76</h3><div style="font-size:13px;line-height:1.55;color:#222">'
++'<p><b>Τι είναι:</b> το πρόγραμμα χρονιάς του 76ου όπως είναι <b>στο e76</b> — μόνο για ανάγνωση. Οι αλλαγές γίνονται στο e76 (Πρόγραμμα χρονιάς → Μόλα) και φαίνονται εδώ μόλις ξανανοίξει η σελίδα.</p>'
++'<p><b>Τι δείχνει:</b> το <b>Ετήσιο</b> πρόγραμμα και ό,τι έχει <b>δημοσιευτεί</b> — ποτέ προσχέδια. Στις δικές μας δράσεις: <span class="stg pub">✓</span> = δημοσιευμένο, <span class="stg ann">προσωρινό</span> = Ετήσιο, μπορεί ακόμα να αλλάξει. 📅 = έχει μπει σε ημερολόγιο Google (δείξε το για να δεις ποιο).</p>'
++'<p><b>Σάββατα:</b> στη γωνία του κελιού, <b>ΑΛ · ΟΠ · ΚΑ</b> = το τμήμα έχει συγκέντρωση (σκέτο = κανονική, <b>Ε</b> = ειδική, <b>Δ</b> = δράση αντί συγκέντρωσης). Γκρι κελί = κανένα τμήμα δεν έχει συγκέντρωση.</p>'
++'<p><b>Εβδομάδα:</b> Τρίτη → Δευτέρα. Ό,τι γίνεται Κυριακή ή Δευτέρα μπαίνει στο Σάββατο που <b>πέρασε</b> (π.χ. Καθαρά Δευτέρα στο τριήμερο της).</p>'
++'<p><b>Φίλτρα / Εκτύπωση / Excel:</b> διαλέγεις άποψη (Σύστημα, ΑΛ, ΟΠ, ΚΑ) και πηγή (Γενική, Επαρχία, 76ο)· τα τικ λένε τι μπαίνει στην εκτύπωση και στο Excel.</p></div>';
+var f=document.createElement('div');f.className='row';f.style.justifyContent='flex-end';f.style.marginTop='10px';var ok=document.createElement('button');ok.className='btn pri';ok.textContent='Κλείσιμο';ok.onclick=close;f.appendChild(ok);b.appendChild(f);document.getElementById('modal').classList.add('on');}
 function close(){ST.added=ST.added.filter(function(x){var tg=ST.tags[x.id]||x.tags||[];return tg.length>0||!x.user});document.getElementById('modal').classList.remove('on');save()}
 document.getElementById('modal').onclick=(e)=>{if(e.target.id==='modal')close()};
 function addEntry(mi,si,date){if(RO)return;
@@ -291,7 +295,7 @@ function updCount(){let sel=0,vis=0;eachEntry(e=>{if(visible(e)){vis++;if(select
 function applyOvr(){if(!ST.ovr)return;BASE.forEach(m=>m.sats.forEach(s=>s.entries.forEach(e=>{var o=ST.ovr[e.id];if(o)['t','draw','dnote','kind','nights','hours','b'].forEach(k=>{if(o[k]!==undefined)e[k]=o[k]})})))}function syncSrc(){var ss=ST.srcSet||{};var allon=ss.gen&&ss.epx&&ss.pag;document.querySelectorAll('header .btn.src').forEach(function(x){var d=x.dataset.s;x.classList.toggle('act',d==='all'?!!allon:!!ss[d])})}function makeSyg(mi,si){var k=mi+'_'+si;var t=(ST.syg&&ST.syg[k]==='eid')?'Ειδική Συγκέντρωση':'Συγκέντρωση';return {id:'syg_'+k,t:t,tags:['ΣΥΣΤΗΜΑ:Συγκέντρωση'],b:false,src:'ΠΑΓΙΟ',mi:mi,si:si,syn:true};}function sygList(){var out=[];if(ST.syg)Object.keys(ST.syg).forEach(function(k){var p=k.split('_');out.push(makeSyg(+p[0],+p[1]))});return out;}function applyXmains(){if(ST.xmains)ST.xmains.forEach(function(x){if(x&&x.m&&!MAINS[x.m])MAINS[x.m]={c:x.c||'#666',subs:(x.subs&&x.subs.length?x.subs:['—'])}});ORDER=Object.keys(MAINS);}function save(){applyXmains();applyOvr();saveST();renderFilters();renderGrid();updCount();syncSrc()}
 document.querySelectorAll('header .btn[data-p]').forEach(b=>b.onclick=()=>setPreset(b.dataset.p));
 document.querySelectorAll('header .btn.src').forEach(b=>b.onclick=()=>{var d=b.dataset.s;ST.srcSet=ST.srcSet||{gen:1,epx:1,pag:1};if(d==='all'){ST.srcSet={gen:1,epx:1,pag:1}}else{ST.srcSet[d]=ST.srcSet[d]?0:1;if(!ST.srcSet.gen&&!ST.srcSet.epx&&!ST.srcSet.pag)ST.srcSet[d]=1}save()});
-document.getElementById('editBtn').onclick=function(){ST.edit=!ST.edit;document.body.classList.toggle('edit',ST.edit);this.classList.toggle('act',ST.edit)};var _ft=document.getElementById('filtToggle');if(_ft)_ft.onclick=function(){document.body.classList.toggle('showfilters');this.classList.toggle('act',document.body.classList.contains('showfilters'))};var _ob=document.getElementById('othBtn');if(_ob){if(TEAM==='admin'){_ob.style.display='none';}else{_ob.onclick=function(){ST.showOthers=!ST.showOthers;this.classList.toggle('act',ST.showOthers);if(ST.showOthers){['ΑΛ','ΟΠ','ΚΑ'].forEach(function(m){ST.fMain[m]=true;MAINS[m].subs.forEach(function(s){ST.fSub[m+':'+s]=true})});}else{setPreset(TEAM);}EXTRA=buildExtra();save();};}}var _hb=document.getElementById('helpBtn');if(_hb)_hb.onclick=showHelp;var _ac=document.getElementById('addCatBtn');if(_ac&&TEAM==='admin')_ac.onclick=function(){var nm=prompt('Όνομα νέας κατηγορίας:');if(!nm)return;nm=nm.trim();if(!nm||MAINS[nm]){alert('Άκυρο ή υπάρχει ήδη');return;}var col=(prompt('Χρώμα (hex):','#0E7C86')||'#666').trim();var sb=(prompt('Υποκατηγορίες (με κόμμα, ή κενό):','')||'').split(',').map(function(x){return x.trim()}).filter(Boolean);ST.xmains=ST.xmains||[];ST.xmains.push({m:nm,c:col,subs:sb.length?sb:['—']});ST.fMain[nm]=true;(sb.length?sb:['—']).forEach(function(x){ST.fSub[nm+':'+x]=true});save();};var _asb=document.getElementById('allSygBtn');if(_asb&&TEAM==='admin')_asb.onclick=function(){var ks=[];BASE.forEach(function(m,mi){m.sats.forEach(function(sc,si){if(sc.date)ks.push(mi+'_'+si)})});ST.syg=ST.syg||{};var allset=ks.every(function(k){return ST.syg[k]});if(allset){ks.forEach(function(k){delete ST.syg[k]})}else{ks.forEach(function(k){if(!ST.syg[k])ST.syg[k]='syg'})}save();};
+(document.getElementById('editBtn')||{}).onclick=function(){ST.edit=!ST.edit;document.body.classList.toggle('edit',ST.edit);this.classList.toggle('act',ST.edit)};var _ft=document.getElementById('filtToggle');if(_ft)_ft.onclick=function(){document.body.classList.toggle('showfilters');this.classList.toggle('act',document.body.classList.contains('showfilters'))};var _ob=document.getElementById('othBtn');if(_ob){if(TEAM==='admin'){_ob.style.display='none';}else{_ob.onclick=function(){ST.showOthers=!ST.showOthers;this.classList.toggle('act',ST.showOthers);if(ST.showOthers){['ΑΛ','ΟΠ','ΚΑ'].forEach(function(m){ST.fMain[m]=true;MAINS[m].subs.forEach(function(s){ST.fSub[m+':'+s]=true})});}else{setPreset(TEAM);}EXTRA=buildExtra();save();};}}var _hb=document.getElementById('helpBtn');if(_hb)_hb.onclick=showHelp;var _ac=document.getElementById('addCatBtn');if(_ac&&TEAM==='admin')_ac.onclick=function(){var nm=prompt('Όνομα νέας κατηγορίας:');if(!nm)return;nm=nm.trim();if(!nm||MAINS[nm]){alert('Άκυρο ή υπάρχει ήδη');return;}var col=(prompt('Χρώμα (hex):','#0E7C86')||'#666').trim();var sb=(prompt('Υποκατηγορίες (με κόμμα, ή κενό):','')||'').split(',').map(function(x){return x.trim()}).filter(Boolean);ST.xmains=ST.xmains||[];ST.xmains.push({m:nm,c:col,subs:sb.length?sb:['—']});ST.fMain[nm]=true;(sb.length?sb:['—']).forEach(function(x){ST.fSub[nm+':'+x]=true});save();};var _asb=document.getElementById('allSygBtn');if(_asb&&TEAM==='admin')_asb.onclick=function(){var ks=[];BASE.forEach(function(m,mi){m.sats.forEach(function(sc,si){if(sc.date)ks.push(mi+'_'+si)})});ST.syg=ST.syg||{};var allset=ks.every(function(k){return ST.syg[k]});if(allset){ks.forEach(function(k){delete ST.syg[k]})}else{ks.forEach(function(k){if(!ST.syg[k])ST.syg[k]='syg'})}save();};
 function molaXlsx(){
  if(typeof XLSX==='undefined'){alert('Χρειάζεται σύνδεση internet για την εξαγωγή Excel.');return}
  const BORD={top:{style:'thin',color:{rgb:'999999'}},bottom:{style:'thin',color:{rgb:'999999'}},left:{style:'thin',color:{rgb:'999999'}},right:{style:'thin',color:{rgb:'999999'}}};
@@ -379,7 +383,7 @@ function molaXlsx(){
 function expJSON(){const blob=new Blob([JSON.stringify(ST)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mola_epilogi.json';a.click()}
 function impJSON(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{ST=Object.assign({tags:{},off:{},added:[],fMain:{},fSub:{},srcSet:{gen:1,epx:1,pag:1},ovr:{},del:{},syg:{},sygOff:{},xmains:[]},JSON.parse(r.result));save()}catch(e){alert('Μη έγκυρο αρχείο')}};r.readAsText(f)}
 function resetAll(){if(confirm('Επαναφορά όλων των επιλογών/κατηγοριών;')){localStorage.removeItem(LSK);location.reload()}}
-if(ST.edit){document.body.classList.add('edit');document.getElementById('editBtn').classList.add('act')}
+
 if(ST.preset){document.querySelectorAll('header .btn[data-p]').forEach(b=>b.classList.toggle('act',b.dataset.p===ST.preset))}
 if(TEAM==='ΑΛ'||TEAM==='ΟΠ'||TEAM==='ΚΑ'){setPreset(TEAM)}else{setPreset('all')}
 if(TEAM!=='admin'&&!RO){['ΣΥΣΤΗΜΑ','ΑΡΓΙΕΣ','ΒΑΘΜΟΦΟΡΩΝ'].forEach(m=>{ST.fMain[m]=true;MAINS[m].subs.forEach(s=>ST.fSub[m+':'+s]=true)})}
@@ -393,39 +397,26 @@ function e76Cell(iso){var d=new Date(iso+'T12:00:00');var dw=d.getDay();d.setDat
  for(var mi=0;mi<BASE.length;mi++){if(MN[mi]!==d.getMonth()+1)continue;var st=BASE[mi].sats;for(var si=0;si<st.length;si++){if(parseInt(st[si].date,10)===d.getDate())return{mi:mi,si:si,date:st[si].date,sat:d}}}return null}
 function e76Entry(r){if(!r.event_date)return null;var c=e76Cell(r.event_date);if(!c)return null;var d=new Date(r.event_date+'T12:00:00');
  var tags=(r.tags&&r.tags.length)?r.tags:['ΣΥΣΤΗΜΑ:Σημαντικά'];var up=(r.level==='Γενική Εφορεία'||r.level==='Επαρχιακή Εφορεία'||tags.some(function(t){return t.split(':')[0]==='ΑΡΓΙΕΣ'}));
- var e={id:'e76:'+r.id,t:r.title,tags:tags,b:!!r.bold,src:up?'ΓΕ':'ΤΜΗΜΑ',mi:c.mi,si:c.si,date:c.date,nights:r.nights||0,kind:KIND_OF[r.type]||'',hours:r.hours||'',owner:r.section||'ΠΑΓΙΟ',fromTeam:true,stage:r.stage};
+ var e={id:'e76:'+r.id,t:r.title,tags:tags,b:!!r.bold,src:up?'ΓΕ':'ΤΜΗΜΑ',mi:c.mi,si:c.si,date:c.date,nights:r.nights||0,kind:KIND_OF[r.type]||'',hours:r.hours||'',owner:r.section||'ΠΑΓΙΟ',fromTeam:true,stage:r.stage,mine:!up,cal:r.cal||[]};
  e.draw=d.getDate()+'/'+(d.getMonth()+1);if(d.getDate()!==c.sat.getDate()||r.nights)e.dnote=molaDay(e.draw);return e}
+var SESS={};var SES_SEC={'Αγέλη':['ΑΛ','#8F6B00'],'Ομάδα':['ΟΠ','#3D5F26'],'Κοινότητα':['ΚΑ','#900000'],'Σύστημα':['ΣΥΣ','#15558F']};
+function sesLetter(k){k=String(k||'').toLowerCase();return k.indexOf('ειδ')===0?'Ε':k.indexOf('δρ')===0?'Δ':'Σ'}
+function sesHTML(key){var L=SESS[key];if(!L)return '';var order=['Σύστημα','Αγέλη','Ομάδα','Κοινότητα'];
+ return '<span class="sesc">'+order.filter(function(x){return L[x]}).map(function(x){var c=SES_SEC[x];var l=sesLetter(L[x]);
+  return '<b style="background:'+c[1]+'" title="'+x+': '+L[x]+'">'+c[0]+(l==='Σ'?'':' '+l)+'</b>'}).join('')+'</span>'}
+var CAL_L={sys:'Σύστημα',staff:'Επιτελείο',open:'Φίλοι'};
+/* 08/10: mola_feed() = ίδιο παράθυρο + στάδιο + ημερολόγια + συγκεντρώσεις τμημάτων. */
 function loadE76(){
  setStatus('Ανάγνωση από το e76…');
- fetch(E76_URL+'/rest/v1/rpc/mola_window',{method:'POST',headers:{'apikey':E76_KEY,'Authorization':'Bearer '+E76_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_year:E76_YEAR})})
+ fetch(E76_URL+'/rest/v1/rpc/mola_feed',{method:'POST',headers:{'apikey':E76_KEY,'Authorization':'Bearer '+E76_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_year:E76_YEAR})})
  .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
- .then(function(rows){BASE.forEach(function(m){m.sats.forEach(function(sc){sc.entries=[]})});ST.added=[];ST.syg={};ST.del={};ST.ovr={};POOLA=[];POOLT=[];
-   EXTRA=(rows||[]).map(e76Entry).filter(Boolean);var n=(rows||[]).filter(function(x){return x.stage==='annual'}).length;
-   save();var tg=document.getElementById('teamTag');if(tg)tg.textContent=' — Ετήσιο πρόγραμμα από το e76 · '+EXTRA.length+' εγγραφές'+(n?' ('+n+' ακόμη προσωρινές)':'')+' · '+new Date().toLocaleTimeString('el-GR',{hour:'2-digit',minute:'2-digit'});})
+ .then(function(j){var rows=(j&&j.events)||[];BASE.forEach(function(m){m.sats.forEach(function(sc){sc.entries=[]})});ST.added=[];ST.syg={};ST.del={};ST.ovr={};POOLA=[];POOLT=[];
+   SESS={};((j&&j.sessions)||[]).forEach(function(x){var c=e76Cell(x.d);if(!c)return;var k=c.mi+'_'+c.si;(SESS[k]=SESS[k]||{})[x.sec]=x.kind});
+   EXTRA=rows.map(e76Entry).filter(Boolean);var n=rows.filter(function(x){return x.stage==='annual'}).length;
+   save();var tg=document.getElementById('teamTag');if(tg)tg.textContent=' — Ετήσιο πρόγραμμα από το e76 · '+EXTRA.length+' εγγραφές'+(n?' ('+n+' ακόμη προσωρινές)':'')+' · '+new Date().toLocaleTimeString('el-GR',{hour:'2-digit',minute:'2-digit'})+(TEAM==='ΑΛ'||TEAM==='ΟΠ'||TEAM==='ΚΑ'?' · άποψη '+TEAM:'');})
  .catch(function(e){var tg=document.getElementById('teamTag');if(tg)tg.textContent=' — ⚠ Δεν διαβάστηκε το e76 ('+e.message+')';});
 }
 
-function forceRead(){
- if(!API_URL||API_URL.indexOf('__API_URL__')>=0){setStatus('⚠ Όρισε το API_URL στο αρχείο');return;}
- setStatus('Ανάγνωση…');
- window.__molaCb=function(resp){try{
-   var all=(resp&&resp.states)||{};
-   var keys=(TEAM==='admin'||RO)?['tags','off','added','fMain','fSub','preset','ovr','del','syg','xmains']:['added','preset','sygOff'];
-   var mine=all[RO?'admin':TEAM];if(mine){try{var s=JSON.parse(mine);keys.forEach(function(k){if(s[k]!==undefined)ST[k]=s[k]})}catch(e){}}
-   POOLA=[];POOLT=[];
-   Object.keys(all).forEach(function(tm){if(tm===(RO?'admin':TEAM))return;try{var st=JSON.parse(all[tm]);if(tm==='admin'&&TEAM!=='admin'){ST.del=st.del||{};ST.ovr=st.ovr||{};ST.syg=st.syg||{};ST.xmains=st.xmains||[];}(st.added||[]).forEach(function(x){x.owner=x.owner||tm;x.fromTeam=true;(tm==='admin'?POOLA:POOLT).push(x)})}catch(e){}});
-   EXTRA=buildExtra();
-   setStatus('Ενημερώθηκε ✓ '+new Date().toLocaleTimeString());save();
- }catch(e){setStatus('Σφάλμα ανάγνωσης')}};
- var s=document.createElement('script');s.src=API_URL+(API_URL.indexOf('?')>=0?'&':'?')+'callback=__molaCb&_='+Date.now();s.onerror=function(){setStatus('Σφάλμα σύνδεσης με τη βάση')};document.body.appendChild(s);setTimeout(function(){try{s.remove()}catch(e){}},9000);
-}
-function forceWrite(){
- if(!API_URL||API_URL.indexOf('__API_URL__')>=0){setStatus('⚠ Όρισε το API_URL στο αρχείο');return;}
- setStatus('Αποθήκευση…');
- var state=(TEAM==='admin')?{tags:ST.tags,off:ST.off,added:ST.added,fMain:ST.fMain,fSub:ST.fSub,preset:ST.preset,ovr:ST.ovr,del:ST.del,syg:ST.syg,xmains:ST.xmains}:{added:(ST.added||[]).filter(function(x){return x.owner===TEAM}),preset:ST.preset,sygOff:ST.sygOff};
- var payload=JSON.stringify({team:TEAM,state:state});
- fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:payload}).then(function(){setStatus('Στάλθηκε ✓ — κάνε Force read για επιβεβαίωση')}).catch(function(){setStatus('Σφάλμα αποθήκευσης')});
-}
 </script>
 </body>
 </html>
